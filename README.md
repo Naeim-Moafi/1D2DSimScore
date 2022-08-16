@@ -158,7 +158,7 @@ Example:
 
 ## 2D_N
 
-*For the time being only for nuclec acids is possible to parse the different type of the interactions. in the future we aim to make it possible for this module to calculate similarity scores for any 3D structure of macromolecules.*
+*For the time being only methods for classification of interactions in nucleic acids are available. But if user can provide the program with same format in "2D_N/samples" program can calculate the similarity scores with option "a" or "A".*
 
 calculates the similarity scores for nucleic acid 3D structures. For
 how to provide input for this module or how to use ClaRNA (http://iimcb.genesilico.pl/clarna/), you may want to contact Prof. Janusz Bujnicki.
