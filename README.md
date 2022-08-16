@@ -51,13 +51,13 @@ The installation can be done on Windows subsystem Linux (WSL) as well.
 # 3. Usage
 
 Different type of the interactions in 1D2DSimScore in case of inputs are nucleic acids
-- c or C for canonical
-- e or E for extended canonical (wobble (GU WW_cis) will be considered as canonical)
-- n or N for noncanonical
-- w or W for Wobbles (GU WW_cis)
-- b or B for all type of the base pairs
-- s or S for stacking (only for ClaRNA and ClaRNAAll)
-- a or A for All type of possible interacrtions
+* c or C for canonical
+* e or E for extended canonical (wobble (GU WW_cis) will be considered as canonical)
+* n or N for noncanonical
+* w or W for Wobbles (GU WW_cis)
+* b or B for all type of the base pairs
+* s or S for stacking (only for ClaRNA and ClaRNAAll)
+* a or A for All type of possible interacrtions
 
 If the inputs are not nucleic acids and type of interaction is required you can use a or A for all type of interactions comparison.
 
