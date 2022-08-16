@@ -201,7 +201,7 @@ Examples for 2D_N_Dataset files (all vs all):
 In dataset comparison the default extension of the files for 2D_N_Dataset is ".out" but in case the users have differet extension, they can use option -e with extension, for instance, ".dbn".
 
 
-**Notice  that in case of the division by zere in pairwise comparison the amount in the table would be "-". But for dataset comparison the amount in the matrices would be "-1.1".**
+**Notice  that in case of the division by zero in pairwise comparison the amount in the table would be "-". But for dataset comparison the amount in the matrices would be "-1.1".**
 
 # 4. The abbreviation of some of the scores:
 
