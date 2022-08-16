@@ -1,0 +1,13 @@
+# this is a comment line
+>ranges
+17:54
+17:54
+#5:82
+>sequences
+--GUUAAUGUAGCUUAAUAAC-AAAGCAAAGCACUG--AAAAUG---CUUAGAUGGAUA-----A-UUGUAUCCCA-UAAACA--
+GUCUU--UAUGGCUUAGUGGUUAAAGCAUCUCACUGUU--AAUGAGA---AUAC--AUAGGUUCAAUU----CCUAUUGAAGACG
+#GUCUU--UAUGGCUUAGUGGUUAAAGCAUCUCACUGUU------------AUAC--AUAGGUUCAAUU----CCUAUUGAAGACG
+>structures
+.....................................................................................
+.....................................................................................
+#(((((..(((.[[[[)(.{{...]]]].(((((...[................)..(((((.}}........))))))))))))]

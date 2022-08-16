@@ -1,0 +1,8 @@
+#genesilico matrix .gsm
+#Format	DataType=Similarity DataFormat=Square Number=5
+#Names: sample5 sample2 sample4 sample3 sample1
+ 0.000 0.019 0.034 0.032 0.026
+ 0.006 0.000 0.016 0.013 0.006
+ 0.006 0.000 0.000 0.013 0.006
+ 0.010 0.003 0.019 0.000 0.010
+ 0.016 0.010 0.025 0.022 0.000
