@@ -56,7 +56,7 @@ Different type of the interactions in 1D2DSimScore in case of inputs are nucleic
 * n or N for noncanonical
 * w or W for Wobbles (GU WW_cis)
 * b or B for all type of the base pairs
-* s or S for stacking (only for ClaRNA and ClaRNAAll)
+* s or S for stacking (only for 2D_N)
 * a or A for All type of possible interacrtions
 
 If the inputs are not nucleic acids and type of interaction is required you can use a or A for all type of interactions comparison.
