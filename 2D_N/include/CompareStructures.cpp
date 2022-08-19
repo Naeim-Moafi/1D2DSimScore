@@ -31,6 +31,7 @@ void CLARNA::CompareStructures::set_isWobble_canonical(bool isWobble_canonical)
 void CLARNA::CompareStructures::readStructures(const std::filesystem::path& refPath, const std::filesystem::path& queryPath, const std::filesystem::path& pdbPath)
 {	
 	auto vfct_pdb = findInteractionRef.readPDBFile(pdbPath);
+	findInteractionQuery.seqWithSeparateChains = findInteractionRef.seqWithSeparateChains; 
 	
 	auto query = findInteractionQuery.readInputFile(queryPath);
 	

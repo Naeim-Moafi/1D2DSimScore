@@ -1,7 +1,6 @@
 /* 
  * Author:  Seyed Naeim Moafinejad
  */
-
  
 /*
  * International Institute of Molecular and Cell Biology (IIMCB)
@@ -18,8 +17,6 @@
  * limitations under the License.
 */
 
-
- 
 #pragma once
  
  /* import  required libraries */

@@ -1,4 +1,3 @@
- 
 /*
  * International Institute of Molecular and Cell Biology (IIMCB)
  * Copyright [2022] [IIMCB]
@@ -15,10 +14,8 @@
 */
 
 
-
 #pragma once
 #define MAX_N_ATOMS_IN_PDB 16000 //it is not limiting constant any more, since chainging static tables to C++ vectors
-
 
 #include <filesystem>
 #include <fstream>

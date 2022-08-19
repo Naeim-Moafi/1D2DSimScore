@@ -31,6 +31,7 @@ void CLARNA::CompareStructures::set_isWobble_canonical(bool isWobble_canonical)
 void CLARNA::CompareStructures::readStructures(const std::filesystem::path& refPath, const std::filesystem::path& queryPath, const std::filesystem::path& pdbPath)
 {	
 	auto vfct_pdb = findInteractionRef.readPDBFile(pdbPath);
+	findInteractionQuery.seqWithSeparateChains = findInteractionRef.seqWithSeparateChains; 
 	
 	auto query = findInteractionQuery.readInputFile(queryPath);
 	
@@ -603,11 +604,53 @@ void CLARNA::CompareStructures::writeScores(std::vector<ConfusionMatrixTuple> vc
 		{
 			std::map<std::string, double> simScoresMapA = calcSimilarityScores(vcmtClaRNA[0], m_vMax_n_positives[0]);
 			outFile << "All," << simScoresMapA["TP"] << "," << simScoresMapA["TN"] << "," << simScoresMapA["FP"] << "," 
-					<< simScoresMapA["FN"] << "," << simScoresMapA["TP"] + simScoresMapA["TN"] + simScoresMapA["FP"] + simScoresMapA["FN"] << "," << simScoresMapA["MCC"] << "," 
-					<< simScoresMapA["FScore"] << "," << simScoresMapA["FMIndex"] << "," << simScoresMapA["JIndex"] << "," << simScoresMapA["Precision"] << ","	
-					<< simScoresMapA["Recall"] << "," << simScoresMapA["Specificity"] << "," << simScoresMapA["BA"] << "," << simScoresMapA["FOR"] << "," 
-					<< simScoresMapA["PT"] << "," << simScoresMapA["CSI"]  << "," << simScoresMapA["MK"] 
-					<< "," << simScoresMapA["JBIndex"] << endl;	
+					<< simScoresMapA["FN"] << "," << simScoresMapA["TP"] + simScoresMapA["TN"] + simScoresMapA["FP"] + simScoresMapA["FN"];
+					if(simScoresMapA["MCC"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapA["MCC"];
+
+					if(simScoresMapA["FScore"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapA["FScore"];
+
+					if(simScoresMapA["FMIndex"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapA["FMIndex"];
+
+					if(simScoresMapA["JIndex"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapA["JIndex"];
+
+					if(simScoresMapA["Precision"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapA["Precision"];
+
+					if(simScoresMapA["Recall"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapA["Recall"];
+
+					if(simScoresMapA["Specificity"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapA["Specificity"];
+
+					if(simScoresMapA["BA"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapA["BA"];
+
+
+					if(simScoresMapA["FOR"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapA["FOR"];
+
+					if(simScoresMapA["PT"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapA["PT"];
+
+					if(simScoresMapA["CSI"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapA["CSI"];
+
+					if(simScoresMapA["MK"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapA["MK"];
+
+					if(simScoresMapA["JBIndex"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapA["JBIndex"] << endl;
+					
+					
+					//<< "," << simScoresMapA["MCC"] << "," 
+					//<< simScoresMapA["FScore"] << "," << simScoresMapA["FMIndex"] << "," << simScoresMapA["JIndex"] << "," << simScoresMapA["Precision"] << ","	
+					//<< simScoresMapA["Recall"] << "," << simScoresMapA["Specificity"] << "," << simScoresMapA["BA"] << "," << simScoresMapA["FOR"] << "," 
+					//<< simScoresMapA["PT"] << "," << simScoresMapA["CSI"]  << "," << simScoresMapA["MK"] 
+					//<< "," << simScoresMapA["JBIndex"] << endl;	
 		}
 		else
 		{
@@ -628,24 +671,115 @@ void CLARNA::CompareStructures::writeScores(std::vector<ConfusionMatrixTuple> vc
 		{
 			std::map<std::string, double> simScoresMapC = calcSimilarityScores(vcmtClaRNA[1], m_vMax_n_positives[1]);
 			outFile << "Cans + wobble," << simScoresMapC["TP"] << "," << simScoresMapC["TN"] << "," << simScoresMapC["FP"] << "," 
-					<< simScoresMapC["FN"] << "," << simScoresMapC["TP"] + simScoresMapC["TN"] + simScoresMapC["FP"] + simScoresMapC["FN"] << "," 
-					<< simScoresMapC["MCC"] << "," << simScoresMapC["FScore"] << "," 
-					<< simScoresMapC["FMIndex"] << "," << simScoresMapC["JIndex"] << "," << simScoresMapC["Precision"] << "," 
-					<< simScoresMapC["Recall"] << "," << simScoresMapC["Specificity"] << "," << simScoresMapC["BA"] << "," << simScoresMapC["FOR"] << "," 
-					<< simScoresMapC["PT"] << "," << simScoresMapC["CSI"]  << "," << simScoresMapC["MK"] 
-				    << "," << simScoresMapC["JBIndex"] << endl;
+					<< simScoresMapC["FN"] << "," << simScoresMapC["TP"] + simScoresMapC["TN"] + simScoresMapC["FP"] + simScoresMapC["FN"];
+					if(simScoresMapC["MCC"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapC["MCC"];
+
+					if(simScoresMapC["FScore"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapC["FScore"];
+
+					if(simScoresMapC["FMIndex"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapC["FMIndex"];
+
+					if(simScoresMapC["JIndex"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapC["JIndex"];
+
+					if(simScoresMapC["Precision"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapC["Precision"];
+
+					if(simScoresMapC["Recall"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapC["Recall"];
+
+					if(simScoresMapC["Specificity"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapC["Specificity"];
+
+					if(simScoresMapC["BA"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapC["BA"];
+
+
+					if(simScoresMapC["FOR"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapC["FOR"];
+
+					if(simScoresMapC["PT"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapC["PT"];
+
+					if(simScoresMapC["CSI"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapC["CSI"];
+
+					if(simScoresMapC["MK"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapC["MK"];
+
+					if(simScoresMapC["JBIndex"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapC["JBIndex"] << endl;
+					
+					
+					
+					
+					
+					
+					
+					 //<< "," 
+					//<< simScoresMapC["MCC"] << "," << simScoresMapC["FScore"] << "," 
+					//<< simScoresMapC["FMIndex"] << "," << simScoresMapC["JIndex"] << "," << simScoresMapC["Precision"] << "," 
+					//<< simScoresMapC["Recall"] << "," << simScoresMapC["Specificity"] << "," << simScoresMapC["BA"] << "," << simScoresMapC["FOR"] << "," 
+					//<< simScoresMapC["PT"] << "," << simScoresMapC["CSI"]  << "," << simScoresMapC["MK"] 
+				    //<< "," << simScoresMapC["JBIndex"] << endl;
 			
 		}
 		else
 		{
 			std::map<std::string, double> simScoresMapC = calcSimilarityScores(vcmtClaRNA[1], m_vMax_n_positives[1]);
 			outFile << "Cans," << simScoresMapC["TP"] << "," << simScoresMapC["TN"] << "," << simScoresMapC["FP"] << "," 
-					<< simScoresMapC["FN"] << "," << simScoresMapC["TP"] + simScoresMapC["TN"] + simScoresMapC["FP"] + simScoresMapC["FN"] << "," 
-					<< simScoresMapC["MCC"] << "," << simScoresMapC["FScore"] << "," 
-					<< simScoresMapC["FMIndex"] << "," << simScoresMapC["JIndex"] << "," << simScoresMapC["Precision"] << "," 
-					<< simScoresMapC["Recall"] << "," << simScoresMapC["Specificity"] << "," << simScoresMapC["BA"] << "," << simScoresMapC["FOR"] << "," 
-					<< simScoresMapC["PT"] << "," << simScoresMapC["CSI"]  << "," << simScoresMapC["MK"] 
-				    << "," << simScoresMapC["JBIndex"] << endl;
+					<< simScoresMapC["FN"] << "," << simScoresMapC["TP"] + simScoresMapC["TN"] + simScoresMapC["FP"] + simScoresMapC["FN"];
+					if(simScoresMapC["MCC"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapC["MCC"];
+
+					if(simScoresMapC["FScore"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapC["FScore"];
+
+					if(simScoresMapC["FMIndex"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapC["FMIndex"];
+
+					if(simScoresMapC["JIndex"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapC["JIndex"];
+
+					if(simScoresMapC["Precision"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapC["Precision"];
+
+					if(simScoresMapC["Recall"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapC["Recall"];
+
+					if(simScoresMapC["Specificity"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapC["Specificity"];
+
+					if(simScoresMapC["BA"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapC["BA"];
+
+
+					if(simScoresMapC["FOR"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapC["FOR"];
+
+					if(simScoresMapC["PT"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapC["PT"];
+
+					if(simScoresMapC["CSI"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapC["CSI"];
+
+					if(simScoresMapC["MK"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapC["MK"];
+
+					if(simScoresMapC["JBIndex"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapC["JBIndex"] << endl;
+					
+					
+					
+					
+					 //<< "," 
+					//<< simScoresMapC["MCC"] << "," << simScoresMapC["FScore"] << "," 
+					//<< simScoresMapC["FMIndex"] << "," << simScoresMapC["JIndex"] << "," << simScoresMapC["Precision"] << "," 
+					//<< simScoresMapC["Recall"] << "," << simScoresMapC["Specificity"] << "," << simScoresMapC["BA"] << "," << simScoresMapC["FOR"] << "," 
+					//<< simScoresMapC["PT"] << "," << simScoresMapC["CSI"]  << "," << simScoresMapC["MK"] 
+				    //<< "," << simScoresMapC["JBIndex"] << endl;
 		}
 	}
 	//else
@@ -658,12 +792,57 @@ void CLARNA::CompareStructures::writeScores(std::vector<ConfusionMatrixTuple> vc
 	{
 		std::map<std::string, double> simScoresMapN = calcSimilarityScores(vcmtClaRNA[2], m_vMax_n_positives[2]);
 		outFile << "NonCans," << simScoresMapN["TP"] << "," << simScoresMapN["TN"] << "," << simScoresMapN["FP"] << ","
-			    << simScoresMapN["FN"] << "," << simScoresMapN["TP"] + simScoresMapN["TN"] + simScoresMapN["FP"] + simScoresMapN["FN"] << "," 
-			    << simScoresMapN["MCC"] << "," << simScoresMapN["FScore"] << "," 
-				<< simScoresMapN["FMIndex"] << "," << simScoresMapN["JIndex"] << "," << simScoresMapN["Precision"] << "," 
-				<< simScoresMapN["Recall"] << "," << simScoresMapN["Specificity"] << "," << simScoresMapN["BA"] << "," << simScoresMapN["FOR"] << "," 
-				<< simScoresMapN["PT"] << "," << simScoresMapN["CSI"]  << "," << simScoresMapN["MK"] 
-				<< "," << simScoresMapN["JBIndex"] << endl;	
+			    << simScoresMapN["FN"] << "," << simScoresMapN["TP"] + simScoresMapN["TN"] + simScoresMapN["FP"] + simScoresMapN["FN"];
+					if(simScoresMapN["MCC"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapN["MCC"];
+
+					if(simScoresMapN["FScore"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapN["FScore"];
+
+					if(simScoresMapN["FMIndex"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapN["FMIndex"];
+
+					if(simScoresMapN["JIndex"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapN["JIndex"];
+
+					if(simScoresMapN["Precision"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapN["Precision"];
+
+					if(simScoresMapN["Recall"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapN["Recall"];
+
+					if(simScoresMapN["Specificity"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapN["Specificity"];
+
+					if(simScoresMapN["BA"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapN["BA"];
+
+
+					if(simScoresMapN["FOR"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapN["FOR"];
+
+					if(simScoresMapN["PT"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapN["PT"];
+
+					if(simScoresMapN["CSI"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapN["CSI"];
+
+					if(simScoresMapN["MK"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapN["MK"];
+
+					if(simScoresMapN["JBIndex"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapN["JBIndex"] << endl;
+			    
+			    
+			    
+			    
+			    
+			     //<< "," 
+			    //<< simScoresMapN["MCC"] << "," << simScoresMapN["FScore"] << "," 
+				//<< simScoresMapN["FMIndex"] << "," << simScoresMapN["JIndex"] << "," << simScoresMapN["Precision"] << "," 
+				//<< simScoresMapN["Recall"] << "," << simScoresMapN["Specificity"] << "," << simScoresMapN["BA"] << "," << simScoresMapN["FOR"] << "," 
+				//<< simScoresMapN["PT"] << "," << simScoresMapN["CSI"]  << "," << simScoresMapN["MK"] 
+				//<< "," << simScoresMapN["JBIndex"] << endl;	
 	}
 	//else
 	//{
@@ -676,12 +855,56 @@ void CLARNA::CompareStructures::writeScores(std::vector<ConfusionMatrixTuple> vc
 	{
 		std::map<std::string, double> simScoresMapW = calcSimilarityScores(vcmtClaRNA[4], m_vMax_n_positives[4]);
 		outFile << "Wobbles," << simScoresMapW["TP"] << "," << simScoresMapW["TN"] << "," << simScoresMapW["FP"] << "," 
-			    << simScoresMapW["FN"] << "," << simScoresMapW["TP"] + simScoresMapW["TN"] + simScoresMapW["FP"] + simScoresMapW["FN"] << "," 
-			    << simScoresMapW["MCC"] << "," << simScoresMapW["FScore"] << "," 
-				<< simScoresMapW["FMIndex"] << "," << simScoresMapW["JIndex"] << "," << simScoresMapW["Precision"] << "," 
-				<< simScoresMapW["Recall"] << "," << simScoresMapW["Specificity"] << "," << simScoresMapW["BA"] << "," << simScoresMapW["FOR"] << "," 
-				<< simScoresMapW["PT"] << "," << simScoresMapW["CSI"]  << "," << simScoresMapW["MK"] 
-				<< "," << simScoresMapW["JBIndex"] << endl;
+			    << simScoresMapW["FN"] << "," << simScoresMapW["TP"] + simScoresMapW["TN"] + simScoresMapW["FP"] + simScoresMapW["FN"];
+					if(simScoresMapW["MCC"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapW["MCC"];
+
+					if(simScoresMapW["FScore"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapW["FScore"];
+
+					if(simScoresMapW["FMIndex"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapW["FMIndex"];
+
+					if(simScoresMapW["JIndex"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapW["JIndex"];
+
+					if(simScoresMapW["Precision"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapW["Precision"];
+
+					if(simScoresMapW["Recall"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapW["Recall"];
+
+					if(simScoresMapW["Specificity"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapW["Specificity"];
+
+					if(simScoresMapW["BA"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapW["BA"];
+
+
+					if(simScoresMapW["FOR"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapW["FOR"];
+
+					if(simScoresMapW["PT"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapW["PT"];
+
+					if(simScoresMapW["CSI"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapW["CSI"];
+
+					if(simScoresMapW["MK"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapW["MK"];
+
+					if(simScoresMapW["JBIndex"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapW["JBIndex"] << endl;
+			    
+			    
+			    
+			    
+			     //<< "," 
+			    //<< simScoresMapW["MCC"] << "," << simScoresMapW["FScore"] << "," 
+				//<< simScoresMapW["FMIndex"] << "," << simScoresMapW["JIndex"] << "," << simScoresMapW["Precision"] << "," 
+				//<< simScoresMapW["Recall"] << "," << simScoresMapW["Specificity"] << "," << simScoresMapW["BA"] << "," << simScoresMapW["FOR"] << "," 
+				//<< simScoresMapW["PT"] << "," << simScoresMapW["CSI"]  << "," << simScoresMapW["MK"] 
+				//<< "," << simScoresMapW["JBIndex"] << endl;
 	}
 	//else
 	//{
@@ -693,12 +916,55 @@ void CLARNA::CompareStructures::writeScores(std::vector<ConfusionMatrixTuple> vc
 	{
 		std::map<std::string, double> simScoresMapS = calcSimilarityScores(vcmtClaRNA[3], m_vMax_n_positives[3]);
 		outFile << "Stacks," << simScoresMapS["TP"] << "," << simScoresMapS["TN"] << "," << simScoresMapS["FP"] << "," 
-			    << simScoresMapS["FN"] << "," << simScoresMapS["TP"] + simScoresMapS["TN"] + simScoresMapS["FP"] + simScoresMapS["FN"] << "," 
-			    << simScoresMapS["MCC"] << "," << simScoresMapS["FScore"] << "," 
-				<< simScoresMapS["FMIndex"] << "," << simScoresMapS["JIndex"] << "," << simScoresMapS["Precision"] << "," 
-				<< simScoresMapS["Recall"] << "," << simScoresMapS["Specificity"] << "," << simScoresMapS["BA"] << "," << simScoresMapS["FOR"] << "," 
-				<< simScoresMapS["PT"] << "," << simScoresMapS["CSI"]  << "," << simScoresMapS["MK"] 
-				<< "," << simScoresMapS["JBIndex"] << endl;	
+			    << simScoresMapS["FN"] << "," << simScoresMapS["TP"] + simScoresMapS["TN"] + simScoresMapS["FP"] + simScoresMapS["FN"];
+					if(simScoresMapS["MCC"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapS["MCC"];
+
+					if(simScoresMapS["FScore"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapS["FScore"];
+
+					if(simScoresMapS["FMIndex"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapS["FMIndex"];
+
+					if(simScoresMapS["JIndex"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapS["JIndex"];
+
+					if(simScoresMapS["Precision"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapS["Precision"];
+
+					if(simScoresMapS["Recall"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapS["Recall"];
+
+					if(simScoresMapS["Specificity"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapS["Specificity"];
+
+					if(simScoresMapS["BA"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapS["BA"];
+
+
+					if(simScoresMapS["FOR"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapS["FOR"];
+
+					if(simScoresMapS["PT"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapS["PT"];
+
+					if(simScoresMapS["CSI"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapS["CSI"];
+
+					if(simScoresMapS["MK"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapS["MK"];
+
+					if(simScoresMapS["JBIndex"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapS["JBIndex"] << endl;
+			    
+			    
+			    
+			     //<< "," 
+			    //<< simScoresMapS["MCC"] << "," << simScoresMapS["FScore"] << "," 
+				//<< simScoresMapS["FMIndex"] << "," << simScoresMapS["JIndex"] << "," << simScoresMapS["Precision"] << "," 
+				//<< simScoresMapS["Recall"] << "," << simScoresMapS["Specificity"] << "," << simScoresMapS["BA"] << "," << simScoresMapS["FOR"] << "," 
+				//<< simScoresMapS["PT"] << "," << simScoresMapS["CSI"]  << "," << simScoresMapS["MK"] 
+				//<< "," << simScoresMapS["JBIndex"] << endl;	
 	}
 	//else
 	//{
@@ -711,12 +977,57 @@ void CLARNA::CompareStructures::writeScores(std::vector<ConfusionMatrixTuple> vc
 	{
 		std::map<std::string, double> simScoresMapB = calcSimilarityScores(vcmtClaRNA[5], m_vMax_n_positives[5]);
 		outFile << "BasePairs," << simScoresMapB["TP"] << "," << simScoresMapB["TN"] << "," << simScoresMapB["FP"] << "," 
-			    << simScoresMapB["FN"] << "," << simScoresMapB["TP"] + simScoresMapB["TN"] + simScoresMapB["FP"] + simScoresMapB["FN"] << "," 
-			    << simScoresMapB["MCC"] << "," << simScoresMapB["FScore"] << "," 
-				<< simScoresMapB["FMIndex"] << "," << simScoresMapB["JIndex"] << "," << simScoresMapB["Precision"] << "," 
-				<< simScoresMapB["Recall"] << "," << simScoresMapB["Specificity"] << "," << simScoresMapB["BA"] << "," << simScoresMapB["FOR"] << "," 
-				<< simScoresMapB["PT"] << "," << simScoresMapB["CSI"]  << "," << simScoresMapB["MK"] 
-				<< "," << simScoresMapB["JBIndex"] << endl;	
+			    << simScoresMapB["FN"] << "," << simScoresMapB["TP"] + simScoresMapB["TN"] + simScoresMapB["FP"] + simScoresMapB["FN"];
+					if(simScoresMapB["MCC"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapB["MCC"];
+
+					if(simScoresMapB["FScore"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapB["FScore"];
+
+					if(simScoresMapB["FMIndex"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapB["FMIndex"];
+
+					if(simScoresMapB["JIndex"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapB["JIndex"];
+
+					if(simScoresMapB["Precision"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapB["Precision"];
+
+					if(simScoresMapB["Recall"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapB["Recall"];
+
+					if(simScoresMapB["Specificity"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapB["Specificity"];
+
+					if(simScoresMapB["BA"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapB["BA"];
+
+
+					if(simScoresMapB["FOR"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapB["FOR"];
+
+					if(simScoresMapB["PT"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapB["PT"];
+
+					if(simScoresMapB["CSI"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapB["CSI"];
+
+					if(simScoresMapB["MK"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapB["MK"];
+
+					if(simScoresMapB["JBIndex"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMapB["JBIndex"] << endl;
+			    
+			    
+			    
+			    
+			    
+			     //<< "," 
+			    //<< simScoresMapB["MCC"] << "," << simScoresMapB["FScore"] << "," 
+				//<< simScoresMapB["FMIndex"] << "," << simScoresMapB["JIndex"] << "," << simScoresMapB["Precision"] << "," 
+				//<< simScoresMapB["Recall"] << "," << simScoresMapB["Specificity"] << "," << simScoresMapB["BA"] << "," << simScoresMapB["FOR"] << "," 
+				//<< simScoresMapB["PT"] << "," << simScoresMapB["CSI"]  << "," << simScoresMapB["MK"] 
+				//<< "," << simScoresMapB["JBIndex"] << endl;	
 	}
 	//else
 	//{

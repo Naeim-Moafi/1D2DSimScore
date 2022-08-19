@@ -1280,7 +1280,7 @@ void CLARNA::FindInteractions::checkClaRNAwithPDB(const std::vector<FullClaRNATu
 	// this vfct_clarna must contain non-interacted edges, and be cleaned.
 	// the size of vfct_clarna and vfct_pdb must be the same
 	std::string clarna_seq;
-	int num_error { 0 };
+	//int num_error { 0 };
 	
 	if(vfct_clarna.size() != vfct_pdb.size())
 	{
@@ -1289,22 +1289,23 @@ void CLARNA::FindInteractions::checkClaRNAwithPDB(const std::vector<FullClaRNATu
 	}
 
 	auto vfct_size = vfct_clarna.size();
+	
 
-	for(size_t i { 0 }; i < vfct_size; i+=5)
+	for(size_t i { 0 }; i < vfct_size; i+=m_number_involved_faces_edges)
 	{
 		clarna_seq += std::get<2>(vfct_clarna[i]);
-		if(std::get<0>(vfct_clarna[i]) != std::get<0>(vfct_clarna[i + 5]) )
+		if(std::get<0>(vfct_clarna[i]) != std::get<0>(vfct_clarna[i + m_number_involved_faces_edges]) )
 		{
 			clarna_seq += " ";
 		}
 	
 	}	
 	
-	if(num_error > 0)
+	if(clarna_seq != seqWithSeparateChains)
 	{
 		cout << "Choosing wrong inputs, check if PDB file and ClaRNA output file are compatible\n";
 		cout << "ClaRNA: " <<  clarna_seq << endl;
-		cout << "PDB:       " << seqWithSeparateChains << endl;
+		cout << "PDB:    " << seqWithSeparateChains << endl;
 	}
 }
 
