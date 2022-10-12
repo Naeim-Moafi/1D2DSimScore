@@ -92,6 +92,8 @@ namespace SS
 			void set_isWobble_canonical(bool isWobble_canonical) ;
 			bool get_withSeq() const;
 			void set_withSeq(bool withSeq);
+			bool get_is_2D_on() const;\
+			void set_is_2D_on(bool is_2D_on);
 			
 			bool isCanonical(std::pair<int, int> ssPair) const;
 			bool isWobble(std::pair<int, int> ssPair) const;
@@ -144,6 +146,7 @@ namespace SS
 			int m_numberOfAllBasePairs;
 			bool m_isWobble_canonical;
 			bool m_withSeq;
+			bool m_is_2D_on;
 			
 	};
 }

@@ -24,6 +24,12 @@ SS::CompareStructures::CompareStructures(bool isWobble_canonical, bool withSeq)
 	findInteractionQuery.set_withSeq(withSeq);
 }
 
+void SS::CompareStructures::set_is_2D_on(bool is_2D_on)
+{
+	findInteractionRef.set_is_2D_on(is_2D_on);
+	findInteractionQuery.set_is_2D_on(is_2D_on);
+}
+
 // readStructuresSS
 void SS::CompareStructures::readStructures(const fs::path& refPath, const fs::path& queryPath)
 {
@@ -602,9 +608,9 @@ void SS::CompareStructures::writeScores(std::vector<ConfusionMatrixTuple> vcmt, 
 	std::ofstream outFile(outputPath.string().c_str());
 	// writing the header to the file
 	outFile << "Interaction_Type," << "TP," << "TN," << "FP," << "FN," << "ALL," 
-	    	<< " MCC,"  << "FSCORE," << "FM_INDEX," << "J_INDEX," 
+	    	<< " MCC,"  << "F1," << "FM," << "J," 
 		    << " PRECISION," << " RECALL," << " Specificity," << " BA," << " FOR,"
-		    << "PT," << "CSI," << "MK," << "JBIndex" << std::endl;
+		    << "PT," << "CSI," << "MK," << "B" << std::endl;
 	for(size_t i{0}; i < vcmt.size(); ++i)
 	{
 		auto [TP, TN, FP, FN] = vcmt[i];
@@ -620,28 +626,107 @@ void SS::CompareStructures::writeScores(std::vector<ConfusionMatrixTuple> vcmt, 
 			
 			outFile << vInteractionTypes1[i] << simScoresMap["TP"]
 					<< "," << simScoresMap["TN"] << "," << simScoresMap["FP"]
-					<< "," << simScoresMap["FN"]  << "," << TP+TN+FP+FN
-					<< "," << simScoresMap["MCC"] << "," << simScoresMap["FScore"]
-					<< "," << simScoresMap["FMIndex"] << "," << simScoresMap["JIndex"]
-					<< "," << simScoresMap["Precision"] << "," << simScoresMap["Recall"]
-					<< "," << simScoresMap["Specificity"] << "," << simScoresMap["BA"]
-					<< "," << simScoresMap["FOR"] << "," << simScoresMap["PT"]
-					<< "," << simScoresMap["CSI"] << "," << simScoresMap["MK"]
-					<< "," << simScoresMap["JBIndex"] << endl;
+					<< "," << simScoresMap["FN"]  << "," << TP+TN+FP+FN;
+					if(simScoresMap["MCC"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMap["MCC"];
+
+					if(simScoresMap["FScore"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMap["FScore"];
+
+					if(simScoresMap["FMIndex"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMap["FMIndex"];
+
+					if(simScoresMap["JIndex"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMap["JIndex"];
+
+					if(simScoresMap["Precision"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMap["Precision"];
+
+					if(simScoresMap["Recall"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMap["Recall"];
+
+					if(simScoresMap["Specificity"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMap["Specificity"];
+
+					if(simScoresMap["BA"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMap["BA"];
+
+
+					if(simScoresMap["FOR"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMap["FOR"];
+
+					if(simScoresMap["PT"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMap["PT"];
+
+					if(simScoresMap["CSI"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMap["CSI"];
+
+					if(simScoresMap["MK"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMap["MK"];
+
+					if(simScoresMap["JBIndex"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMap["JBIndex"] << endl;
+	
+					//<< "," << simScoresMap["MCC"] << "," << simScoresMap["FScore"]
+					//<< "," << simScoresMap["FMIndex"] << "," << simScoresMap["JIndex"]
+					//<< "," << simScoresMap["Precision"] << "," << simScoresMap["Recall"]
+					//<< "," << simScoresMap["Specificity"] << "," << simScoresMap["BA"]
+					//<< "," << simScoresMap["FOR"] << "," << simScoresMap["PT"]
+					//<< "," << simScoresMap["CSI"] << "," << simScoresMap["MK"]
+					//<< "," << simScoresMap["JBIndex"] << endl;
 		}
 		else
 		{ // Cans + Wobble
 			//stdExt::tuplePrint(vcmt[i]);
 			outFile << vInteractionTypes2[i] << simScoresMap["TP"]
 					<< "," << simScoresMap["TN"] << "," << simScoresMap["FP"]
-					<< "," << simScoresMap["FN"]  << "," << TP+TN+FP+FN
-					<< "," << simScoresMap["MCC"] << "," << simScoresMap["FScore"]
-					<< "," << simScoresMap["FMIndex"] << "," << simScoresMap["JIndex"]
-					<< "," << simScoresMap["Precision"] << "," << simScoresMap["Recall"]
-					<< "," << simScoresMap["Specificity"] << "," << simScoresMap["BA"]
-					<< "," << simScoresMap["FOR"] << "," << simScoresMap["PT"]
-					<< "," << simScoresMap["CSI"] << "," << simScoresMap["MK"]
-					<< "," << simScoresMap["JBIndex"] << endl;
+					<< "," << simScoresMap["FN"]  << "," << TP+TN+FP+FN;
+					if(simScoresMap["MCC"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMap["MCC"];
+
+					if(simScoresMap["FScore"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMap["FScore"];
+
+					if(simScoresMap["FMIndex"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMap["FMIndex"];
+
+					if(simScoresMap["JIndex"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMap["JIndex"];
+
+					if(simScoresMap["Precision"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMap["Precision"];
+
+					if(simScoresMap["Recall"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMap["Recall"];
+
+					if(simScoresMap["Specificity"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMap["Specificity"];
+
+					if(simScoresMap["BA"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMap["BA"];
+
+
+					if(simScoresMap["FOR"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMap["FOR"];
+
+					if(simScoresMap["PT"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMap["PT"];
+
+					if(simScoresMap["CSI"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMap["CSI"];
+
+					if(simScoresMap["MK"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMap["MK"];
+
+					if(simScoresMap["JBIndex"] == -1.1) outFile << ",-";
+					else outFile << "," << simScoresMap["JBIndex"] << endl;
+					//<< "," << simScoresMap["MCC"] << "," << simScoresMap["FScore"]
+					//<< "," << simScoresMap["FMIndex"] << "," << simScoresMap["JIndex"]
+					//<< "," << simScoresMap["Precision"] << "," << simScoresMap["Recall"]
+					//<< "," << simScoresMap["Specificity"] << "," << simScoresMap["BA"]
+					//<< "," << simScoresMap["FOR"] << "," << simScoresMap["PT"]
+					//<< "," << simScoresMap["CSI"] << "," << simScoresMap["MK"]
+					//<< "," << simScoresMap["JBIndex"] << endl;
 		}
 	}
 	

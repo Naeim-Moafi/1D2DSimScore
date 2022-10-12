@@ -17,8 +17,10 @@
 #include <algorithm>
 #include "CompareStructures.h"
 #include <getopt.h>
+#include <chrono>
 
 using namespace std;
+using namespace std::chrono;
 
 
 void showHelp(){
@@ -209,6 +211,7 @@ int main(int argc, char* argv[])
 		outFilename = "FinalResuts.csv";
 	}
 	
+	auto start = chrono::high_resolution_clock::now();
 	if(dotBracketFlag)
 	{
 		SS::CompareStructures cs;
@@ -219,6 +222,8 @@ int main(int argc, char* argv[])
 			cs.findInteractionRef.set_isWobble_canonical(true);
 			cs.findInteractionQuery.set_isWobble_canonical(true);
 		}
+		
+		cs.set_is_2D_on(matrixFlag);
 		cs.readStructures(refPath, queryPath);
 		//cs.findInteractionRef.set_withSeq(sequenceFlag);
 		//cs.findInteractionQuery.set_withSeq(sequenceFlag);
@@ -265,6 +270,14 @@ int main(int argc, char* argv[])
 		showHelp();
 		exit(EXIT_FAILURE);
 	}
+	
+	auto end = high_resolution_clock::now();
+	auto duration_s = duration_cast<seconds>(end - start);
+	auto duration_ms = duration_cast<milliseconds>(end - start);
+	
+	if(duration_s.count() == 0) cout << "running time: " << duration_ms.count() << " ms\n";
+	else cout << "running time: " << duration_s.count() << " s\n";
+	
 	cout << "Done ;)" << endl;
 
 	

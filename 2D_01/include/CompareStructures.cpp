@@ -24,6 +24,12 @@ SS::CompareStructures::CompareStructures(bool isWobble_canonical, bool withSeq)
 	findInteractionQuery.set_withSeq(withSeq);
 }
 
+void SS::CompareStructures::set_is_2D_on(bool is_2D_on)
+{
+	findInteractionRef.set_is_2D_on(is_2D_on);
+	findInteractionQuery.set_is_2D_on(is_2D_on);
+}
+
 // readStructuresSS
 void SS::CompareStructures::readStructures(const fs::path& refPath, const fs::path& queryPath)
 {

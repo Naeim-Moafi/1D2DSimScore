@@ -56,6 +56,7 @@ namespace SS
 			void readStructures(const fs::path& refPath, const fs::path& queryPath);
 			void sepInteractions();
 			void readsequence(const fs::path& seqPath);
+			void set_is_2D_on(bool is_2D_on);
 			
 			
 			

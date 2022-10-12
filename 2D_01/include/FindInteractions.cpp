@@ -41,6 +41,7 @@ SS::FindInteractions::FindInteractions()
 	m_isWobble_canonical = false;
 	m_withSeq = false;
 	ssSize = 0;
+	m_is_2D_on = false;
 }
 
 SS::FindInteractions::FindInteractions(bool isWobble_canonical, bool withSeq)
@@ -85,6 +86,17 @@ void SS::FindInteractions::set_withSeq(bool withSeq)
 {
 	m_withSeq = withSeq;
 }
+
+bool SS::FindInteractions::get_is_2D_on() const
+{
+	return m_is_2D_on;
+}
+
+void SS::FindInteractions::set_is_2D_on(bool is_2D_on)
+{
+	m_is_2D_on = is_2D_on;
+}
+
 
 void SS::FindInteractions::init_sequence(const std::filesystem::path& seqPath)
 {
@@ -204,7 +216,6 @@ SSContacts SS::FindInteractions::ss2IndicesPair(BasePairSymbols& basePairSymbols
 		throw std::invalid_argument("Something wrong in the secondary structure");
 	}
 	
-	
 	return ssc;
 }
 
@@ -215,7 +226,6 @@ SSMap SS::FindInteractions::SSContacts2SSMap(const SSContacts& ssc)
 	{
 		ssMap.insert(pair);
 	}
-	
 	return ssMap;
 }
 
@@ -228,7 +238,7 @@ SSMatrix SS::FindInteractions::SSContacts2SSMatrix(const SSContacts& ssc)
 	}
 	else
 	{
-		initSSMatrix(ssmat, m_SSMap.size());
+		initSSMatrix(ssmat, ssSize);
 	}
 	for(const auto& pair : ssc)
 	{
@@ -237,6 +247,7 @@ SSMatrix SS::FindInteractions::SSContacts2SSMatrix(const SSContacts& ssc)
 			ssmat[pair.first - 1][pair.second - 1] = 1;
 		}
 	}
+	
 	return ssmat;
 }
 
@@ -337,13 +348,12 @@ void SS::FindInteractions::init_structure(const std::filesystem::path& path)
 		v_ss.emplace_back(ss);
 		ssSize = ss.size();
 	}
-	
 		//std::copy(v_chainsSeq.begin(), v_chainsSeq.end(), std::ostream_iterator<std::string>(cout, " "));
 	
 	try{ 
 		//cout << "The secondary structure: " <<  ss << endl;
-		m_SSMap = extractInteractions_vector(v_ss);
-		m_Matrix_all = extractInteractions_matrix(v_ss);
+		if(!m_is_2D_on) m_SSMap = extractInteractions_vector(v_ss);
+		else m_Matrix_all = extractInteractions_matrix(v_ss);
 	}
 	catch(const std::invalid_argument& ex)
 	{
