@@ -30,6 +30,7 @@ Name of the modules:
 - 2D_01
 - 2D_01_Dataset
 - 2D_01_align
+- 2D_01_CMO
 - 2D_N
 - 2D_N_Dataset
 
@@ -155,6 +156,18 @@ Example:
 	
 	./2D_01_align -i samples/blast_example.txt -b can -o results/outputTest.csv
 
+## 2D_01_CMO
+
+calculates the similarity scores (for alignment in a specific range) for two map directly (*_2.map from ContactExtractor is possible input of this module).
+
+Usage for 2D_01_CMO:
+	
+	./2D_01_CMO -r <referenceFile> -q <queryFile> -o [outputName]
+
+Example:
+	
+	./2D_01_CMO  -r samples/ref.map -q samples/query.map -o results/sampleTest.csv
+
 
 ## 2D_N
 
@@ -216,3 +229,12 @@ In dataset comparison the default extension of the files for 2D_N_Dataset is ".o
 
 ---
 ***You can find the sample of inputs and results in the corresponding directories.***
+
+---
+***How to use 1D2DSimScore as a first-time user***
+---
+1D2DSimScore includes several modules and offers users a wide range of metrics. It might be a bit too much for first-time users who have no previous statistical knowledge. For this reason, we recommend that users use MCC as the default for the 1D algorithm and RPF (Recall, Precision, and F1 score) for the 2D algorithm. It is also recommended to use the 1D algorithm for nucleic acids and the 2D algorithm for other types of biomacromolecules and biomacromolecule complexes.
+
+It is worth mentioning that if the number of lines in 2D_01 is more than 15 thousand lines, using 2D_01_CMO is recommended, as it is much faster.
+
+![](Measuers.png)

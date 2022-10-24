@@ -35,7 +35,9 @@ void SS::CompareStructures::readStructures(const fs::path& refPath, const fs::pa
 {
 	try
 	{
+		cout << "\tReference:\n";
 		findInteractionRef.init_structure(refPath);
+		cout << "\tQuery:\n";
 		findInteractionQuery.init_structure(queryPath);
 	}
 	catch(const std::invalid_argument& ex)
@@ -190,7 +192,6 @@ ConfusionMatrixTuple SS::CompareStructures::calcConfusionMatrixAllMatrix()
 			}
 		}
 	}
-	
 	int possible_intercations_number = (length - 1) * (length - 2) / 2;
 	TN = possible_intercations_number - (TP + FP + FN);
 	return std::make_tuple(TP, TN, FP, FN);	

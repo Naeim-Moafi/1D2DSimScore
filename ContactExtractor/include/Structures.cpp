@@ -1060,17 +1060,21 @@ void Structures::write_seq(const std::filesystem::path& outputPath) const
 void Structures::write_map(const std::filesystem::path& outputPath, const std::vector<std::vector<int>>& contact_map) const
 {
 	std::ofstream outFile(outputPath.string());
+	std::ofstream outFile2(outputPath.string() + "_2");
 	
 	for(size_t i { 0 }; i < contact_map.size(); ++i)
 	{
 		for(size_t j { 0 }; j < contact_map.size(); ++j)
 		{
 			outFile << contact_map[i][j] << " ";
+			outFile2 << contact_map[i][j];
 		}
 		outFile << endl;
+		outFile2 << endl;
 	}
 	
 	outFile.close();
+	outFile2.close();
 }
 
 void Structures::write_map(const std::filesystem::path& outputPath) const

@@ -1,0 +1,2 @@
+Interaction_Type,TP,TN,FP,FN,ALL, MCC,F1,FM,J, PRECISION, RECALL, Specificity, BA, FOR,PT,CSI,MK,
+All,19100,2.9981e+06,0,0,3017196,1,1,1,1,1,1,1,1,0,-,1,1

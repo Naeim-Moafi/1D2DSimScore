@@ -47,6 +47,14 @@ install_2D_01_align() {
 	echo "2D_01_align package is installed";
 }
 
+install_2D_01_CMO() {
+	echo "start installing 2D_01_CMO package...";
+	cd 2D_01_CMO;
+	make > /dev/null ;
+	cp "2D_01_CMO" ../bin
+	cd ..;
+	echo "2D_01_CMO package is installed";
+}
 
 install_2D_N() {
 	echo "start installing 2D_N package...";
@@ -80,6 +88,7 @@ install_all() {
 	install_2D_01;
 	install_2D_01_Dataset;
 	install_2D_01_align;
+	install_2D_01_CMO;
 	install_2D_N;
 	install_2D_N_Dataset;
 }
@@ -92,6 +101,9 @@ clean_all(){
 	make clean > /dev/null;
 	cd ..;
 	cd 2D_01_align;
+	make clean > /dev/null;
+	cd ..
+	cd 2D_01_CMO;
 	make clean > /dev/null;
 	cd ..;
 	cd 2D_N;
@@ -132,6 +144,7 @@ do
 		2D_01) install_2D_01;;
 		2D_01_Dataset) install_2D_01_Dataset;;
 		2D_01_align) install_2D_01_align;;
+		2D_01_CMO) install_2D_01_CMO;;
 		2D_N) install_2D_N;;
 		2D_N_Dataset) install_2D_N_Dataset;;
 		all)install_all;;

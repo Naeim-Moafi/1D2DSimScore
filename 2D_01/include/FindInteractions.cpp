@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <exception>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <iterator>
 #include <sstream>
@@ -119,9 +120,10 @@ void SS::FindInteractions::init_sequence(const std::filesystem::path& seqPath)
 OpenDotCloseIndices SS::FindInteractions::separateOpensDotsCloses(const BasePairSymbols& basePairSymbols, const std::vector<std::string>& v_ss) const
 {
 	std::vector<int> vOpens, vDots, vCloses, vBrackets;
-	
+	int n = 0;
 	for( const auto& ss : v_ss)
 	{
+		cout << "\t\tSeparating brackes: " << int(100 * (++n)/v_ss.size()) << "%\r"; 
 		for(size_t i { 0 }; i < ss.size(); ++i)
 		{
 			auto itOpen = std::find_if(std::begin(basePairSymbols), std::end(basePairSymbols), [&ss, i](BasePairSymbol bpChar){return (bpChar.first == ss[i]);});
@@ -140,6 +142,7 @@ OpenDotCloseIndices SS::FindInteractions::separateOpensDotsCloses(const BasePair
 			}
 		}
 	}
+	cout << "\n";
 	// finding the dots
 	for(size_t i { 0 }; i < v_ss[0].size(); ++i)
 	{
@@ -149,7 +152,6 @@ OpenDotCloseIndices SS::FindInteractions::separateOpensDotsCloses(const BasePair
 			vDots.push_back(i+1);
 		}
 	}
-	
 	if (vOpens.size() != vCloses.size())
 	{
 		throw std::invalid_argument("The number of open and close are not equal");
@@ -174,15 +176,21 @@ SSContacts SS::FindInteractions::ss2IndicesPair(BasePairSymbols& basePairSymbols
 	}
 	
 	// insert non interacted nucleotides
+	//int m = 0;
 	for(const auto& dotIndex : odcIndices.vDots)
 	{
-		ssc.emplace_back(std::make_pair(dotIndex, -1));
+		//cout << "\t\tadding dots: " << ++m << "/" << odcIndices.vDots.size() << "\r";
+ 		ssc.emplace_back(std::make_pair(dotIndex, -1));
 	}
-	
-	int numberOfExpectedInteractions = odcIndices.vOpens.size();;
+	//cout << "\n";
+	int numberOfExpectedInteractions = odcIndices.vOpens.size();
 	int numberOfDetectedInteractions = 0;
+	int n = 0;
+	cout << std::fixed;
 	for(auto& ss : v_ss)
 	{
+		cout << "\t\tParsing pairs: " << std::setprecision(2) << 100 * float(++n)/v_ss.size() << "%\r";
+		if(v_ss.size() > 10000) cout << std::flush;
 		// finding the base-pairs with iterating over the open and close symbols vectors
 		for(int  i = odcIndices.vOpens.size() - 1; i >= 0; --i)
 		{
@@ -208,6 +216,7 @@ SSContacts SS::FindInteractions::ss2IndicesPair(BasePairSymbols& basePairSymbols
 			}
 		}
 	}
+	cout << "\n";
 	// checking the number of interactions
 	if(numberOfExpectedInteractions != numberOfDetectedInteractions)
 	{
@@ -328,7 +337,6 @@ void SS::FindInteractions::init_structure(const std::filesystem::path& path)
 		}
 		exit(EXIT_FAILURE);
 	}
-
 	while(!inpFile.fail())
 	{
 		std::getline(inpFile, line);
@@ -336,7 +344,6 @@ void SS::FindInteractions::init_structure(const std::filesystem::path& path)
 		{ // break for emty line
 			break;
 		}
-		
 		std::istringstream iss(line);
 		std::string ss;
 		std::string chainSS;

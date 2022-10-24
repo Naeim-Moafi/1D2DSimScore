@@ -47,7 +47,7 @@ void showHelp(){
 	
 
 	cout << "Usage:\n\t./2D_01 -r <referenceFile> -s [sequenceFile] -q <queryFile> -d <requested_interactions> --1D (or --2D) -o [outputName]";
-	cout << "\nexample:\n\t./2D_01  -r samples/dotBracketRef.SS -q samples/dotBracketQuery.SS -s samples/SeqForDotBracket.seq -d enaw --1D -o results/sampleTest.csvs";
+	cout << "\nexample:\n\t./2D_01  -r samples/dotBracketRef.SS -q samples/dotBracketQuery.SS -s samples/SeqForDotBracket.seq -d enaw --1D -o results/sampleTest.csv";
 	cout << endl;
 	exit(EXIT_FAILURE);
 }
