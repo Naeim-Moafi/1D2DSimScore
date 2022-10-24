@@ -1,7 +1,7 @@
 Author:	
 		Seyed Naeim Moafinejad: snmoafinejad@iimcb.gov.pl
 # 1D2DSimScore
-# Content list
+# Table of contents
 - [Functionality](https://github.com/Naeim-Moafi/1D2DSimScore#1-functionality)
 - [Installation](https://github.com/Naeim-Moafi/1D2DSimScore#2-installation)
 - [Usage](https://github.com/Naeim-Moafi/1D2DSimScore#3-usage)
