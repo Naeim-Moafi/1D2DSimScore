@@ -241,7 +241,7 @@ In dataset comparison the default extension of the files for 2D_N_Dataset is ".o
 ---
 ***How to use 1D2DSimScore as a first-time user***
 ---
-1D2DSimScore includes several modules and offers users a wide range of metrics. It might be a bit too much for first-time users who have no previous statistical knowledge. For this reason, we recommend that users use MCC as the default for the 1D algorithm and RPF (Recall, Precision, and F1 score) for the 2D algorithm. It is also recommended to use the 1D algorithm for nucleic acids and the 2D algorithm for other types of biomacromolecules and biomacromolecule complexes.
+1D2DSimScore includes several modules and offers users a wide range of metrics. It might be a bit too much for first-time users who have no previous statistical knowledge. For this reason, we recommend that users use MCC as the default for the 1D algorithm and F1-score for the 2D algorithm. It is also recommended to use the 1D algorithm for nucleic acids and the 2D algorithm for other types of biomacromolecules and biomacromolecule complexes.
 
 It is worth mentioning that if the number of lines in 2D_01 is more than 15 thousand lines, using 2D_01_CMO is recommended, as it is much faster.
 
