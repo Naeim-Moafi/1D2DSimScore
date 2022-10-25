@@ -246,3 +246,5 @@ In dataset comparison the default extension of the files for 2D_N_Dataset is ".o
 It is worth mentioning that if the number of lines in 2D_01 is more than four thousand lines, using 2D_01_CMO is recommended, as it is much faster.
 
 ![](Measuers.png)
+
+***For more infomation look at [Confusion matrix](https://en.wikipedia.org/wiki/Confusion_matrix)***
