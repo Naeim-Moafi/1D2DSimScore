@@ -1,6 +1,7 @@
 #!/bin/bash
 # A script for installing different modules of 1D2DSimScore
 
+
 install_1D_01() {
 	echo "start installing 1D_01 package...";
 	cd 1D_01;

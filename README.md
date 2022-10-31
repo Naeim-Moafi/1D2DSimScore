@@ -242,6 +242,6 @@ In dataset comparison the default extension of the files for 2D_N_Dataset is ".o
 ---
 1D2DSimScore includes several modules and offers users a wide range of metrics. It might be a bit too much for the first-time users who have no previous statistical knowledge. For this reason, we recommend that users use MCC as the default for the 1D algorithm and F1-score for the 2D algorithm. It is also recommended to use the 1D algorithm for nucleic acids and the 2D algorithm for other types of biomacromolecules and biomacromolecule complexes.
 
-![](Measuers.png)
+![](Measuers_.png)
 
 ***For more information look at [Confusion matrix](https://en.wikipedia.org/wiki/Confusion_matrix)***
