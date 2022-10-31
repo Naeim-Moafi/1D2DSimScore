@@ -25,7 +25,7 @@ void SimilarityScores::setCategories(int TP, int TN, int FP, int FN)
 // using nodiscard attribute to make sure the return value is not being ignored. 
 double SimilarityScores::calcMCC() const
 {
-	double numerator = ((TP * TN) - (FP * FN));
+	double numerator = ((static_cast<double>(TP) * static_cast<double>(TN)) - (static_cast<double>(FP) * static_cast<double>(FN)));
 	double denominator = sqrt((static_cast<double>(TP + FP) * static_cast<double>(TP + FN) * static_cast<double>(TN + FP) * static_cast<double>(TN + FN)));
 	
 	double mcc = numerator / denominator;

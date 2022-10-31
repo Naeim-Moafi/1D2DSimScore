@@ -10,6 +10,15 @@
 #include <stdexcept>
 #include <chrono>
 
+std::vector<std::vector<int>> v_v_open_poses(30);
+std::map<char, std::vector<int>> map_v_open_poses = {{'(',v_v_open_poses[0]},{'{',v_v_open_poses[1]}, {'[',v_v_open_poses[2]}, {'<',v_v_open_poses[3]}, {'A',v_v_open_poses[4]},
+													{'B',v_v_open_poses[5]}, {'C',v_v_open_poses[6]}, {'D',v_v_open_poses[7]}, {'E',v_v_open_poses[8]}, {'F',v_v_open_poses[9]},
+													{'G',v_v_open_poses[10]},{'H',v_v_open_poses[11]},{'I',v_v_open_poses[12]},{'G',v_v_open_poses[13]},{'K',v_v_open_poses[14]},
+													{'L',v_v_open_poses[15]},{'M',v_v_open_poses[16]},{'N',v_v_open_poses[17]},{'O',v_v_open_poses[18]},{'P',v_v_open_poses[19]},
+													{'Q',v_v_open_poses[20]},{'R',v_v_open_poses[21]},{'S',v_v_open_poses[22]},{'T',v_v_open_poses[23]},{'U',v_v_open_poses[24]},
+													{'V',v_v_open_poses[25]},{'W',v_v_open_poses[26]},{'X',v_v_open_poses[27]},{'Y',v_v_open_poses[28]},{'Z',v_v_open_poses[29]}};
+
+
 //using namespace std;
 using namespace std::chrono;
 
@@ -20,14 +29,10 @@ using std::cerr;
 void initSSMatrix(SSMatrix& ssMat, size_t length)
 {
 	ssMat.clear();
+	ssMat.resize(length);
 	for(size_t i { 0 }; i < length; ++i)
 	{
-		std::vector<int> v_tmp;
-		for(size_t j { 0 }; j < length; ++j)
-		{
-			v_tmp.push_back(0);
-		}
-		ssMat.emplace_back(v_tmp);
+		ssMat[i].resize(length);
 	}
 }
 
@@ -120,10 +125,8 @@ void SS::FindInteractions::init_sequence(const std::filesystem::path& seqPath)
 OpenDotCloseIndices SS::FindInteractions::separateOpensDotsCloses(const BasePairSymbols& basePairSymbols, const std::vector<std::string>& v_ss) const
 {
 	std::vector<int> vOpens, vDots, vCloses, vBrackets;
-	int n = 0;
 	for( const auto& ss : v_ss)
-	{
-		cout << "\t\tSeparating brackes: " << int(100 * (++n)/v_ss.size()) << "%\r"; 
+	{ 
 		for(size_t i { 0 }; i < ss.size(); ++i)
 		{
 			auto itOpen = std::find_if(std::begin(basePairSymbols), std::end(basePairSymbols), [&ss, i](BasePairSymbol bpChar){return (bpChar.first == ss[i]);});
@@ -142,7 +145,6 @@ OpenDotCloseIndices SS::FindInteractions::separateOpensDotsCloses(const BasePair
 			}
 		}
 	}
-	cout << "\n";
 	// finding the dots
 	for(size_t i { 0 }; i < v_ss[0].size(); ++i)
 	{
@@ -160,71 +162,35 @@ OpenDotCloseIndices SS::FindInteractions::separateOpensDotsCloses(const BasePair
 	return OpenDotCloseIndices{.vOpens = vOpens, .vDots = vDots, .vCloses = vCloses};
 }
 
-// ss2IndicesPair
 SSContacts SS::FindInteractions::ss2IndicesPair(BasePairSymbols& basePairSymbols, std::vector<std::string> v_ss)
 {
 	SSContacts ssc;
-	OpenDotCloseIndices odcIndices;
-	try
-	{
-		odcIndices = separateOpensDotsCloses(basePairSymbols, v_ss);
-	}
-	catch(const std::invalid_argument& ex)
-	{
-		cerr << ex.what() << endl;
-		exit(EXIT_FAILURE);
-	}
-	
-	// insert non interacted nucleotides
-	//int m = 0;
-	for(const auto& dotIndex : odcIndices.vDots)
-	{
-		//cout << "\t\tadding dots: " << ++m << "/" << odcIndices.vDots.size() << "\r";
- 		ssc.emplace_back(std::make_pair(dotIndex, -1));
-	}
-	//cout << "\n";
-	int numberOfExpectedInteractions = odcIndices.vOpens.size();
-	int numberOfDetectedInteractions = 0;
-	int n = 0;
-	cout << std::fixed;
+	//separateOpensDotsCloses(basePairSymbols, v_ss);
 	for(auto& ss : v_ss)
 	{
-		cout << "\t\tParsing pairs: " << std::setprecision(2) << 100 * float(++n)/v_ss.size() << "%\r";
-		if(v_ss.size() > 10000) cout << std::flush;
-		// finding the base-pairs with iterating over the open and close symbols vectors
-		for(int  i = odcIndices.vOpens.size() - 1; i >= 0; --i)
+		for(int i{0}; i < std::ssize(ss) ; ++i)
 		{
-			for(size_t j { 0 }; j < odcIndices.vCloses.size(); ++j)
+			auto it_open = std::find(openSymbols.begin(), openSymbols.end(), ss[i]);
+			if(it_open != openSymbols.end())
 			{
-				// for base paring the index of the close symbol always must be greater than open one
-				if(odcIndices.vCloses[j] < odcIndices.vOpens[i])
-				{
-					continue; // do not consider it
-				}
-				
-				// basePairSymbols is a map which has keyType = char, and valueType = char
-				// so we get key from ss input file and compare the value (close symbol) to the one in the ss input file.
-				if(basePairSymbols[ss[odcIndices.vOpens[i] - 1]] == ss[odcIndices.vCloses[j] - 1])
-				{
-					ssc.emplace_back(std::make_pair(odcIndices.vOpens[i], odcIndices.vCloses[j]));
-					ssc.emplace_back(std::make_pair(odcIndices.vCloses[j], odcIndices.vOpens[i]));
-					++m_numberOfAllBasePairs;
-					ss.replace(ss.begin() + odcIndices.vOpens[i] - 1, ss.begin() + odcIndices.vOpens[i], ".");
-					ss.replace(ss.begin() + odcIndices.vCloses[j] - 1, ss.begin() + odcIndices.vCloses[j], ".");
-					++numberOfDetectedInteractions;
-				}
+				map_v_open_poses[ss[i]].push_back(i+1);
 			}
+			
+			auto it_close = std::find(closeSymbols.begin(), closeSymbols.end(), ss[i]);
+			if(it_close != closeSymbols.end()) 
+			{
+				if(map_v_open_poses[basePairSymbols[ss[i]]].size() == 0) {cout << "The number of open brackets are less than close brackets\n"; exit(EXIT_FAILURE);}
+				ssc.emplace_back(std::make_pair(map_v_open_poses[basePairSymbols[ss[i]]].back(), i+1));
+				ssc.emplace_back(std::make_pair(i+1, map_v_open_poses[basePairSymbols[ss[i]]].back())); 
+				map_v_open_poses[basePairSymbols[ss[i]]].pop_back();
+			}
+			if(ss[i] == '.') ssc.emplace_back(std::make_pair(i+1, -1));
+		}
+		for(auto const openSymbol : openSymbols)
+		{
+			if(map_v_open_poses[openSymbol].size() != 0) {cout << "The number of close brackets are less than open brackets\n"; exit(EXIT_FAILURE);}
 		}
 	}
-	cout << "\n";
-	// checking the number of interactions
-	if(numberOfExpectedInteractions != numberOfDetectedInteractions)
-	{
-		//cout << fmt::format("the number of expected base pairs is {} but {} number of base pairs are found", numberOfExpectedInteractions, numberOfDetectedInteractions) << endl;
-		cout << "the number of expected base pairs is" << numberOfExpectedInteractions << "but" <<  numberOfDetectedInteractions << "number of base pairs are found" << endl;
-		throw std::invalid_argument("Something wrong in the secondary structure");
-	}
-	
 	return ssc;
 }
 
@@ -268,7 +234,8 @@ SSMatrix SS::FindInteractions::extractInteractions_matrix(const std::vector<std:
 	BasePairSymbols basePairSymbols;
 	for(size_t i{0}; i < openSymbols.size(); ++i)
 	{
-		basePairSymbols.insert(std::make_pair(openSymbols[i], closeSymbols[i]));
+		//basePairSymbols1.insert(std::make_pair(openSymbols[i], closeSymbols[i]));
+		basePairSymbols.insert(std::make_pair(closeSymbols[i], openSymbols[i]));	
 	}
 	try
 	{
@@ -280,7 +247,6 @@ SSMatrix SS::FindInteractions::extractInteractions_matrix(const std::vector<std:
 		cerr << ex.what() << endl;
 		exit(EXIT_FAILURE);
 	}
-	
 	return ssMatrix;
 }
 
@@ -292,7 +258,8 @@ SSMap SS::FindInteractions::extractInteractions_vector(const std::vector<std::st
 	BasePairSymbols basePairSymbols;
 	for(size_t i{0}; i < openSymbols.size(); ++i)
 	{
-		basePairSymbols.insert(std::make_pair(openSymbols[i], closeSymbols[i]));
+		//basePairSymbols.insert(std::make_pair(openSymbols[i], closeSymbols[i]));
+		basePairSymbols.insert(std::make_pair(closeSymbols[i], openSymbols[i]));	
 	}
 	
 	try
@@ -376,7 +343,7 @@ void SS::FindInteractions::init_structure(const std::filesystem::path& path)
 
 
 // isCanonical
-bool SS::FindInteractions::isCanonical(std::pair<int, int> ssPair) const
+bool SS::FindInteractions::isCanonical(const std::pair<int, int>& ssPair) const
 {	
 	if(ssPair.second != -1)
 	{
@@ -405,6 +372,30 @@ bool SS::FindInteractions::isCanonical(std::pair<int, int> ssPair) const
 	return false;
 }
 
+bool::SS::FindInteractions::isCanonical(int first, int second) const
+{
+	if((m_sequence[first] == 'A' && (m_sequence[second] == 'U' || m_sequence[second] == 'T'))
+	|| ((m_sequence[first] == 'U' || m_sequence[second] == 'T') && m_sequence[second] == 'A'))
+	{
+		return true;
+	}
+	if((m_sequence[first] == 'C' && m_sequence[second] == 'G')
+	   || (m_sequence[first] == 'G' && m_sequence[second] == 'C'))
+	{
+		return true;
+	}
+	if(m_isWobble_canonical)
+	{
+		if((m_sequence[first] == 'G' && (m_sequence[second] == 'U' || m_sequence[second] == 'T'))
+		   || ((m_sequence[second] == 'U' || m_sequence[second] == 'T') && m_sequence[second] == 'G'))
+		{
+			return true;
+		}
+	}
+	
+	return false;
+}
+
 bool SS::FindInteractions::isWobble(std::pair<int, int> ssPair) const
 {
 	if((m_sequence[ssPair.first - 1] == 'G' && (m_sequence[ssPair.second - 1] == 'U' || m_sequence[ssPair.second - 1] == 'T'))
@@ -416,12 +407,23 @@ bool SS::FindInteractions::isWobble(std::pair<int, int> ssPair) const
 	return false;
 }
 
-// mapSS2seq
-void SS::FindInteractions::mapSS2seq(SSMap ssMap)
+bool SS::FindInteractions::isWobble(int first, int second) const
 {
-	initSSMatrix(m_Matrix_can, m_sequence.size());
-	initSSMatrix(m_Matrix_noncan, m_sequence.size());
-	initSSMatrix(m_Matrix_wobble, m_sequence.size());
+	if((m_sequence[first] == 'G' && (m_sequence[second] == 'U' || m_sequence[second] == 'T'))
+	   || ((m_sequence[first] == 'U' || m_sequence[second] == 'T') && m_sequence[second] == 'G'))
+	{
+		return true;
+	}
+	
+	return false;
+}
+
+// mapSS2seq
+void SS::FindInteractions::mapSS2seqVec(const SSMap& ssMap)
+{
+	//initSSMatrix(m_Matrix_can, m_sequence.size());
+	//initSSMatrix(m_Matrix_noncan, m_sequence.size());
+	//initSSMatrix(m_Matrix_wobble, m_sequence.size());
 	for(const auto& ssPair : ssMap)
 	{
 		if(isCanonical(ssPair))
@@ -434,16 +436,16 @@ void SS::FindInteractions::mapSS2seq(SSMap ssMap)
 				m_SSMap_wobble.insert(std::make_pair(ssPair.first, ssPair.second));
 				m_SSMap_wobble.insert(std::make_pair(ssPair.second, ssPair.first));
 				
-				m_Matrix_wobble[ssPair.first - 1][ssPair.second - 1] = 1;
-				m_Matrix_wobble[ssPair.second - 1][ssPair.first - 1] = 1;
+				//m_Matrix_wobble[ssPair.first - 1][ssPair.second - 1] = 1;
+				//m_Matrix_wobble[ssPair.second - 1][ssPair.first - 1] = 1;
 			}
 			else
 			{
 				m_SSMap_wobble.insert(std::make_pair(ssPair.first, -1));
 			}
 			// add the information into the canonical interactins' matrix
-			m_Matrix_can[ssPair.first - 1][ssPair.second - 1] = 1;
-			m_Matrix_can[ssPair.second - 1][ssPair.first - 1] = 1;
+			//m_Matrix_can[ssPair.first - 1][ssPair.second - 1] = 1;
+			//m_Matrix_can[ssPair.second - 1][ssPair.first - 1] = 1;
 			++m_numberOfCanBasePairs;
 		}
 		else
@@ -458,8 +460,8 @@ void SS::FindInteractions::mapSS2seq(SSMap ssMap)
 					m_SSMap_wobble.insert(std::make_pair(ssPair.first, ssPair.second));
 					m_SSMap_wobble.insert(std::make_pair(ssPair.second, ssPair.first));
 						
-					m_Matrix_wobble[ssPair.first - 1][ssPair.second - 1] = 1;
-					m_Matrix_wobble[ssPair.second - 1][ssPair.first - 1] = 1;
+					//m_Matrix_wobble[ssPair.first - 1][ssPair.second - 1] = 1;
+					//m_Matrix_wobble[ssPair.second - 1][ssPair.first - 1] = 1;
 				}
 				else
 				{
@@ -467,13 +469,44 @@ void SS::FindInteractions::mapSS2seq(SSMap ssMap)
 				}
 				
 				// add the information into the canonical interactins' matrix
-				m_Matrix_noncan[ssPair.first - 1][ssPair.second - 1] = 1;
-				m_Matrix_noncan[ssPair.second - 1][ssPair.first - 1] = 1;
+				//m_Matrix_noncan[ssPair.first - 1][ssPair.second - 1] = 1;
+				//m_Matrix_noncan[ssPair.second - 1][ssPair.first - 1] = 1;
 				++m_numberOfNonCanBasePairs;
 			}
 			else
 			{
 				m_SSMap_wobble.insert(std::make_pair(ssPair.first, -1));				
+			}
+		}
+	}
+}
+
+void SS::FindInteractions::mapSS2seqMat(const SSMatrix& ssMat)
+{
+	initSSMatrix(m_Matrix_can, m_sequence.size());
+	initSSMatrix(m_Matrix_noncan, m_sequence.size());
+	initSSMatrix(m_Matrix_wobble, m_sequence.size());
+	
+	for(int i{0}; i < std::ssize(ssMat); ++i)
+	{
+		for(int j{i+1}; j < std::ssize(ssMat); ++j)
+		{
+			//cout << m_sequence[i] << " " << m_sequence[j] << " " << std::boolalpha << isCanonical(i,j) << "\n";
+			//getchar();
+			if(isCanonical(i,j))
+			{
+				m_Matrix_can[i][j] = ssMat[i][j];
+				m_Matrix_can[j][i] = ssMat[j][i];
+			}
+			else
+			{
+				m_Matrix_noncan[i][j] = ssMat[i][j];
+				m_Matrix_noncan[j][i] = ssMat[j][i];
+			}
+			if(isWobble(i,j))
+			{
+				m_Matrix_wobble[i][j]=ssMat[i][j];
+				m_Matrix_wobble[j][i]=ssMat[j][i];
 			}
 		}
 	}

@@ -34,7 +34,7 @@
 
 using SSMap = std::map<int, int>;
 using SSContacts = std::vector<std::pair<int, int>>;
-using SSMatrix = std::vector<std::vector<int>>;
+using SSMatrix = std::vector<std::vector<bool>>;
 
 //============================================================
 // !!! Be careful with these two following types !!!         |
@@ -92,10 +92,12 @@ namespace SS
 			void set_isWobble_canonical(bool isWobble_canonical) ;
 			bool get_withSeq() const;
 			void set_withSeq(bool withSeq);
-			bool get_is_2D_on() const;\
+			bool get_is_2D_on() const;
 			void set_is_2D_on(bool is_2D_on);
 			
-			bool isCanonical(std::pair<int, int> ssPair) const;
+			bool isCanonical(const std::pair<int, int>& ssPair) const;
+			bool isCanonical(int first, int second) const;
+			bool isWobble(int first, int second) const;
 			bool isWobble(std::pair<int, int> ssPair) const;
 			
 			
@@ -110,7 +112,7 @@ namespace SS
 			// it gets the BasePairSymbols and vector of the secondary structures
 			// separate the indices for the open and close brackets
 			// at the end remains would be dots 
-			[[nodiscard]] OpenDotCloseIndices separateOpensDotsCloses(const BasePairSymbols& basePairSymbols, const std::vector<std::string>& v_ss) const; 
+			OpenDotCloseIndices separateOpensDotsCloses(const BasePairSymbols& basePairSymbols, const std::vector<std::string>& v_ss) const; 
 			
 			// ss2IndicesPair here is not the overriden here
 			// it is the new one with different argument
@@ -128,7 +130,8 @@ namespace SS
 			void readInputFile(const std::filesystem::path& seqpath);
 			
 			// a fucntion for the separating canonical and noncanonical interactions
-			void mapSS2seq(SSMap ssMap);
+			void mapSS2seqVec(const SSMap& ssMap);
+			void mapSS2seqMat(const SSMatrix& ssMat);
 			
 			
 			

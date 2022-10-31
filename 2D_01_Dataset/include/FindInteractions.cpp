@@ -17,6 +17,7 @@ SS_all::FindInteractions::FindInteractions()
 	: m_numberOfCanBasePairs{0}, m_numberOfNonCanBasePairs{0}, m_numberOfAllBasePairs{0} 
 	{
 		m_isWobble_canonical = false;
+		m_is_2D_on = false;
 	}
 
 SS_all::FindInteractions::FindInteractions(bool isWobble_canonical)
@@ -45,6 +46,16 @@ void SS_all::FindInteractions::set_extension(const std::string& extension)
 	m_extension = extension;
 }
 
+
+bool SS_all::FindInteractions::get_is_2D_on() const
+{
+	return m_is_2D_on;
+}
+
+void SS_all::FindInteractions::set_is_2D_on(bool is_2D_on)
+{
+	m_is_2D_on = is_2D_on;
+}
 
 void SS_all::FindInteractions::init_sequence(const std::filesystem::path& path)
 {
@@ -102,6 +113,7 @@ void SS_all::FindInteractions::init_sequence(const std::filesystem::path& path)
 				m_seqFlag = true;
 			}
 		}
+		if(!m_seqFlag) {cout << "program need a sequence file with .seq extenstion, please look at samples\n"; exit(EXIT_FAILURE);}
 	}
 	else
 	{
@@ -150,6 +162,7 @@ void SS_all::FindInteractions::init_structures_single(const std::filesystem::pat
 		if(line[0] == '>' && line != ">seq")
 		{
 			m_vStructures_name.push_back(line.substr(1));
+			cout << line.substr(1) << ":\n";
 			auto oldPos = inpFile.tellg();
 			std::vector<std::string> v_lines;
 			while(std::getline(inpFile, line))
@@ -166,8 +179,8 @@ void SS_all::FindInteractions::init_structures_single(const std::filesystem::pat
 				//cout << line << endl;
 				v_lines.push_back(line);
 			}
-			m_vSSMaps.emplace_back(SS::FindInteractions::extractInteractions_vector(v_lines));
-			m_vMatrix_all.emplace_back(SS::FindInteractions::extractInteractions_matrix(v_lines));
+			if(!m_is_2D_on) m_vSSMaps.emplace_back(SS::FindInteractions::extractInteractions_vector(v_lines));
+			else m_vMatrix_all.emplace_back(SS::FindInteractions::extractInteractions_matrix(v_lines));
 		}
 	}
 }
@@ -184,6 +197,7 @@ void SS_all::FindInteractions::init_structures_multiple(const std::filesystem::p
 			m_extFlag = true;
 			std::ifstream inpFile(tmp_path.string());
 			m_vStructures_name.emplace_back(tmp_path.stem().string());
+			cout << tmp_path.stem().string() << ":\n";
 			std::string line;
 			std::vector<std::string> v_lines;
 			while(std::getline(inpFile, line))
@@ -194,8 +208,8 @@ void SS_all::FindInteractions::init_structures_multiple(const std::filesystem::p
 				}
 				v_lines.push_back(line);
 			}
-			m_vSSMaps.emplace_back(SS::FindInteractions::extractInteractions_vector(v_lines));
-			m_vMatrix_all.emplace_back(SS::FindInteractions::extractInteractions_matrix(v_lines));
+			if(!m_is_2D_on) m_vSSMaps.emplace_back(SS::FindInteractions::extractInteractions_vector(v_lines));
+			else m_vMatrix_all.emplace_back(SS::FindInteractions::extractInteractions_matrix(v_lines));
 		}
 	}
 	

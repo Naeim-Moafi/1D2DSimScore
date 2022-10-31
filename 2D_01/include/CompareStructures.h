@@ -85,9 +85,10 @@ namespace SS
 			void writeScores(std::vector<ConfusionMatrixTuple> vcmt, fs::path outputPath);
 			
 			CompareStructures();
-			CompareStructures(bool isWobble_canonical, bool withSeq);
+			CompareStructures(bool isWobble_canonical, bool withSeq, bool  is_2D_on);
 			virtual ~CompareStructures() = default;
 		private:
+			bool m_is_2D_on;
 			std::vector<int> m_vMax_n_positives;
 			int find_max_n_positives(const SSMap& ref, const SSMap& query) const;
 			int find_max_n_positives(const SSMatrix& ref_, const SSMatrix& query_) const;

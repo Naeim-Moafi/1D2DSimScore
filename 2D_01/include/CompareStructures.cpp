@@ -13,19 +13,23 @@ SS::CompareStructures::CompareStructures()
 	findInteractionRef.set_isWobble_canonical(false);
 	findInteractionQuery.set_isWobble_canonical(false);
 	m_requestedInteractions = "A";
+	m_is_2D_on = false;
 }
 
-SS::CompareStructures::CompareStructures(bool isWobble_canonical, bool withSeq) 
+SS::CompareStructures::CompareStructures(bool isWobble_canonical, bool withSeq, bool is_2D_on) 
 {
 	findInteractionRef.set_isWobble_canonical(isWobble_canonical);
 	findInteractionRef.set_withSeq(withSeq);
 	
 	findInteractionQuery.set_isWobble_canonical(isWobble_canonical);
 	findInteractionQuery.set_withSeq(withSeq);
+	
+	set_is_2D_on(is_2D_on);
 }
 
 void SS::CompareStructures::set_is_2D_on(bool is_2D_on)
 {
+	m_is_2D_on =is_2D_on;
 	findInteractionRef.set_is_2D_on(is_2D_on);
 	findInteractionQuery.set_is_2D_on(is_2D_on);
 }
@@ -35,9 +39,7 @@ void SS::CompareStructures::readStructures(const fs::path& refPath, const fs::pa
 {
 	try
 	{
-		cout << "\tReference:\n";
 		findInteractionRef.init_structure(refPath);
-		cout << "\tQuery:\n";
 		findInteractionQuery.init_structure(queryPath);
 	}
 	catch(const std::invalid_argument& ex)
@@ -192,6 +194,7 @@ ConfusionMatrixTuple SS::CompareStructures::calcConfusionMatrixAllMatrix()
 			}
 		}
 	}
+	
 	int possible_intercations_number = (length - 1) * (length - 2) / 2;
 	TN = possible_intercations_number - (TP + FP + FN);
 	return std::make_tuple(TP, TN, FP, FN);	
@@ -279,9 +282,9 @@ ConfusionMatrixTuple SS::CompareStructures::calcConfusionMatrixCansMatrix()
 {
 	int TP, TN, FP, FN;
 	TP = TN = FP = FN = 0;
-	int length = findInteractionRef.m_Matrix_can.size();
+	int length = findInteractionQuery.m_Matrix_can.size();
 	
-	for(size_t firstNucl = 0;  firstNucl <  findInteractionRef.m_SSMap_can.size(); ++firstNucl)
+	for(size_t firstNucl = 0;  firstNucl <  findInteractionRef.m_Matrix_can.size(); ++firstNucl)
 	{
 		for(size_t secondNucle = firstNucl + 1; secondNucle < findInteractionRef.m_Matrix_can.size(); ++secondNucle)
 		{
@@ -314,7 +317,7 @@ ConfusionMatrixTuple SS::CompareStructures::calcConfusionMatrixWobblesMatrix()
 	TP = TN = FP = FN = 0;
 	int length = findInteractionRef.m_Matrix_can.size();
 	
-	for(size_t firstNucl = 0;  firstNucl <  findInteractionRef.m_SSMap_wobble.size(); ++firstNucl)
+	for(size_t firstNucl = 0;  firstNucl <  findInteractionRef.m_Matrix_wobble.size(); ++firstNucl)
 	{
 		for(size_t secondNucle = firstNucl + 1; secondNucle < findInteractionRef.m_Matrix_can.size(); ++secondNucle)
 		{
@@ -387,7 +390,7 @@ ConfusionMatrixTuple SS::CompareStructures::calcConfusionMatrixNonCansMatrix()
 	TP = TN = FP = FN = 0;
 	int length = findInteractionRef.m_Matrix_noncan.size();
 	
-	for(size_t firstNucl = 0;  firstNucl <  findInteractionRef.m_SSMap_noncan.size(); ++firstNucl)
+	for(size_t firstNucl = 0;  firstNucl <  findInteractionRef.m_Matrix_noncan.size(); ++firstNucl)
 	{
 		for(size_t secondNucle = firstNucl + 1; secondNucle < findInteractionRef.m_Matrix_noncan.size(); ++secondNucle)
 		{
@@ -737,8 +740,8 @@ void SS::CompareStructures::writeScores(std::vector<ConfusionMatrixTuple> vcmt, 
 
 void SS::CompareStructures::sepInteractions()
 {
-	findInteractionRef.mapSS2seq(findInteractionRef.m_SSMap);
-	findInteractionQuery.mapSS2seq(findInteractionQuery.m_SSMap);
+	if(!m_is_2D_on)	{findInteractionRef.mapSS2seqVec(findInteractionRef.m_SSMap);findInteractionQuery.mapSS2seqVec(findInteractionQuery.m_SSMap);}
+	else {findInteractionRef.mapSS2seqMat(findInteractionRef.m_Matrix_all);findInteractionQuery.mapSS2seqMat(findInteractionQuery.m_Matrix_all);}
 }
 
 void SS::CompareStructures::readsequence(const fs::path& seqPath)
@@ -761,10 +764,10 @@ int main()
 	//cs.findInteractionQuery.set_isWobble_canonical(false);
 	
 	//write the SSmaps of the ref and query
-	cs.readStructures("samples/Cruciform.SS", "samples/Cruciform_local_all_minE-000001.ss_detected");
 	cs.findInteractionRef.init_sequence("samples/Cruciform.fasta");
 	cs.findInteractionQuery.init_sequence("samples/Cruciform.fasta");
 	cs.sepInteractions();
+	cs.readStructures("samples/Cruciform.SS", "samples/Cruciform_local_all_minE-000001.ss_detected");
 	auto vcmt = cs.calcConfusionMatrixVector();
 	cs.writeScores(vcmt, "Final_resultes.csv");
 	

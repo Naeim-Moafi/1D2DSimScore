@@ -25,7 +25,7 @@
 
 #include "lib/FindInteractions.h"
 using SSContacts = std::vector<std::pair<int, int>>;
-using SSMatrix = std::vector<std::vector<int>>;
+using SSMatrix = std::vector<std::vector<bool>>;
 
 namespace SS_all
 {
@@ -59,6 +59,8 @@ namespace SS_all
 			bool get_seqFlag() const{ return m_seqFlag;}
 			std::string get_extension() const;
 			void set_extension(const std::string& extension);
+			bool get_is_2D_on() const;
+			void set_is_2D_on(bool is_2D_on);
 						
 			// read file and store the sequence and structures
 			// all the structures have the same sequence
@@ -91,6 +93,7 @@ namespace SS_all
 			bool m_seqFlag = false;
 			bool m_extFlag = false;
 			std::string m_extension;
+			bool m_is_2D_on;
 			
 	};
 }

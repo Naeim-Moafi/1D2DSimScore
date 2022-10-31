@@ -65,6 +65,10 @@ bool SS_all::CompareStructures::get_is_matrix_prefered() const
 	return m_is_matrix_prefered;
 }
 
+void SS_all::CompareStructures::set_is_2D_on(bool is_2D_on)
+{
+	findInteractions.set_is_2D_on(is_2D_on);
+}
 
 // readStructures
 void SS_all::CompareStructures::readFile(const std::filesystem::path& allPath)

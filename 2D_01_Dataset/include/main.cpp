@@ -60,7 +60,6 @@ void showHelp(){
 	cout << "Exmple for 2D_01_Dataset with a file:\n\t./2D_01_Dataset -i samples/AllInOne.SS_all  -D -S MCC,Fscore,for,jInDeX --2D -o results/test.gsm\n";
 	cout << "Usage for 2D_01_Dataset with a folder:\n\t./2D_01_Dataset -i <inputFolder> -D -S <requested_scores_separated_with_comma> -o [outputName]\n";
 	cout << "Exmple for 2D_01_Dataset with a folder:\n\t./2D_01_Dataset -i samples/SSs  -D -S MCC,Fscore,for,jInDeX --2D -o results/test.gsm\n";
-	cout << "Exmple for 2D_01_Dataset with a folder:\n\t./2D_01_Dataset -i samples/dbns  -D -S MCC,Fscore,for,jInDeX --2D -o results/test.gsm\n";
 	cout << "Exmple for 2D_01_Dataset with a folder and different extension:\n\t./2D_01_Dataset -i samples/dbns  -D -S MCC,Fscore,for,jInDeX --2D -o results/test.gsm -e .dbn\n";
 	exit(EXIT_FAILURE);
 }
@@ -158,6 +157,7 @@ int main(int argc, char* argv[])
 	if(d_allFlag)
 	{
 		SS_all::CompareStructures cs;
+		cs.set_is_2D_on(matrixFlag);
 		cs.findInteractions.set_extension(extension);
 		cs.m_requestedScores = requested_scores;
 		if(matrixFlag)

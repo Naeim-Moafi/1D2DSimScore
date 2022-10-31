@@ -43,6 +43,7 @@ namespace SS_all
 			
 			bool get_is_matrix_prefered() const;
 			void set_is_matrix_prefered(bool is_matrix_prefered);
+			void set_is_2D_on(bool is_2D_on);
 			
 			// readStructures(blast)
 			// by using the functions in the FindInteraction function read corresponding file
