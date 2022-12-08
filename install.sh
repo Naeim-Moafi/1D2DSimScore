@@ -3,76 +3,76 @@
 
 
 install_1D_01() {
-	echo "start installing 1D_01 package...";
+	echo -n "start installing 1D_01 package...";
 	cd 1D_01;
 	make > /dev/null ;
 	cp "1D_01" ../bin
 	cd ..;
-	echo "1D_01 package is installed";
+	echo " [DONE]";
 }
 
 install_1D_01_Dataset() {
-	echo "start installing 1D_01_Dataset package...";
+	echo -n "start installing 1D_01_Dataset package...";
 	cd 1D_01_Dataset;
 	make > /dev/null;
 	cp "1D_01_Dataset" ../bin
 	cd ..;
-	echo "1D_01_Dataset package is installed";
+	echo " [DONE]";
 }
 
 install_2D_01() {
-	echo "start installing 2D_01 package...";
+	echo -n "start installing 2D_01 package...";
 	cd 2D_01;
 	make > /dev/null ;
 	cp "2D_01" ../bin
 	cd ..;
-	echo "2D_01 is installed";
+	echo " [DONE]";
 }
 
 
 install_2D_01_Dataset() {
-	echo "start installing 2D_01_Dataset package...";
+	echo -n "start installing 2D_01_Dataset package...";
 	cd 2D_01_Dataset;
 	make > /dev/null;
 	cp "2D_01_Dataset" ../bin
 	cd ..;
-	echo "2D_01_Dataset package is installed";
+	echo " [DONE]";
 }
 
 install_2D_01_align() {
-	echo "start installing 2D_01_align package...";
+	echo -n "start installing 2D_01_align package...";
 	cd 2D_01_align;
 	make > /dev/null ;
 	cp "2D_01_align" ../bin
 	cd ..;
-	echo "2D_01_align package is installed";
+	echo " [DONE]";
 }
 
 install_2D_01_CMO() {
-	echo "start installing 2D_01_CMO package...";
+	echo -n "start installing 2D_01_CMO package...";
 	cd 2D_01_CMO;
 	make > /dev/null ;
 	cp "2D_01_CMO" ../bin
 	cd ..;
-	echo "2D_01_CMO package is installed";
+	echo " [DONE]";
 }
 
 install_2D_N() {
-	echo "start installing 2D_N package...";
+	echo -n "start installing 2D_N package...";
 	cd 2D_N;
 	make > /dev/null ;
 	cp "2D_N" ../bin
 	cd ..;
-	echo "2D_N package is installed";
+	echo " [DONE]";
 }
 
 install_2D_N_Dataset() {
-	echo "start installing 2D_N_Dataset package...";
+	echo -n "start installing 2D_N_Dataset package...";
 	cd 2D_N_Dataset;
 	make > /dev/null;
 	cp "2D_N_Dataset" ../bin
 	cd ..;
-	echo "2D_N_Dataset package is installed";
+	echo " [DONE]";
 }
 
 
@@ -124,7 +124,7 @@ clean_all(){
 
 showHelp(){
 	echo "For installing you can write name of the packages as arguments separated by spaces"
-	echo "or All for installing all packages";
+	echo "or all for installing all packages";
 	echo
 	echo "For unistallling you can choose clean";
 }

@@ -82,7 +82,7 @@ void ReadPDB::read_file(const std::filesystem::path& pdbPath)
 	
 	while(std::getline(inpFile, line))
 	{
-		if(del_spaces(line) == "TER")
+		if(line.substr(0,3) == "TER")
 		{
 			++n_chains;
 			m_vAtomsInChains.emplace_back(curr_chain);

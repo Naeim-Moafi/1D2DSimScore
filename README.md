@@ -204,6 +204,8 @@ Example:
 
 *For nucleic acid we reduce interactions to 1D and in this case we can decrease the effect of the number of negatives for calculation of similarity scores, 2D algorithm would be avialable in the near future.*
 
+***it is required to separate chains with "TER" keywords (in case of 1 chain you can use TER at the end before "END" keyword) and only one model in pdb format file***
+
 ## 2D_N_Dataset
 
 calculates the similarity scores 2D_N_Dataset for RNA 3D structures.
@@ -219,6 +221,8 @@ Example for 2D_N_Dataset files (all vs all):
 
 
 In dataset comparison the default extension of the files for 2D_N_Dataset is ".out" but in case the users have different extension, they can use option -e with extension, for instance, ".dbn".
+
+***it is required to separate chains with "TER" keywords (in case of 1 chain you can use TER at the end before "END" keyword) and only one model in pdb format file***
 
 
 **Notice  that in case of the division by zero in pairwise comparison the amount in the table would be "-". But for dataset comparison the amount in the matrices would be "-1.1".**
