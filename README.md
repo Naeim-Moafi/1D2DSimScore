@@ -249,3 +249,5 @@ In dataset comparison the default extension of the files for 2D_N_Dataset is ".o
 ![](Measuers_.png)
 
 ***For more information look at [Confusion matrix](https://en.wikipedia.org/wiki/Confusion_matrix)***
+
+***To extract residues in contact with a specific distance, you can use the [ContactExtractor](https://github.com/Naeim-Moafi/1D2DSimScore/tree/master/ContactExtractor)***
