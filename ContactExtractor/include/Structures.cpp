@@ -4,6 +4,7 @@
 #include <sstream>
 #include <thread>
 #include <cstdio>
+#include <iomanip>
 std::vector<std::string> RNA = {"A", "C", "G", "U"};
 std::vector<std::string> DNA = {"DA", "DC", "DG", "DU", "DT"};
 std::vector<std::string> PROTEIN = {"ALA", "ARG", "ASN", "ASP",
@@ -62,6 +63,11 @@ std::vector<std::string> structure_string2vec(const std::string& inp_struct, con
 	return v_struct;
 }
 
+void clear_v_string(std::vector<std::string>& v_str)
+{
+	for(auto& str : v_str) { str.clear();}
+}
+
 void Structures::readPDB_allStructures(const std::filesystem::path& inputPath)
 {
 	ReadPDB inputPDB;
@@ -76,42 +82,68 @@ void Structures::readPDB_allStructures(const std::filesystem::path& inputPath)
 	m_rna_seq = extract_rna_seq();
 	m_dna_seq = extract_dna_seq();
 	m_protein_seq = extract_protein_seq();
-
+	create_all_seq();
 	
-	// add structures in desired order
-	m_vAtoms_allStructures.clear();
-	m_vAtoms_allStructures.insert(m_vAtoms_allStructures.end(), m_vAtoms_rna.begin(), m_vAtoms_rna.end());
-	m_vAtoms_allStructures.insert(m_vAtoms_allStructures.end(), m_vAtoms_dna.begin(), m_vAtoms_dna.end());
-	m_vAtoms_allStructures.insert(m_vAtoms_allStructures.end(), m_vAtoms_protein.begin(), m_vAtoms_protein.end());
 	
-
-	std::vector<Atom> v_atoms;
-	std::string chain_seq;
-	Residue residue;
-	Chain chain;
-	
-	for(size_t i_atom  = 0; i_atom < m_vAtoms_allStructures.size()-1; ++i_atom)
+	//update
+	if(update)
 	{
-		v_atoms.emplace_back(m_vAtoms_allStructures[i_atom]);
-		if(m_vAtoms_allStructures[i_atom].nuclNumber != m_vAtoms_allStructures[i_atom + 1].nuclNumber)
+		read_restraint_file(selection_path);
+		sepRNA();
+		sepDNA();
+		sepProtein();
+		clear_v_string(m_rna_seq);
+		clear_v_string(m_dna_seq);
+		clear_v_string(m_protein_seq);
+		clear_v_string(m_sequence_sep_chains);
+		
+		rna_size = dna_size = protein_size = 0;
+		
+		m_rna_seq = extract_rna_seq();
+		m_dna_seq = extract_dna_seq();
+		m_protein_seq = extract_protein_seq();
+		create_all_seq();
+		// add structures in desired order
+		m_vAtoms_allStructures.clear();
+		m_vAtoms_allStructures.insert(m_vAtoms_allStructures.end(), m_vAtoms_rna.begin(), m_vAtoms_rna.end());
+		m_vAtoms_allStructures.insert(m_vAtoms_allStructures.end(), m_vAtoms_dna.begin(), m_vAtoms_dna.end());
+		m_vAtoms_allStructures.insert(m_vAtoms_allStructures.end(), m_vAtoms_protein.begin(), m_vAtoms_protein.end());
+	}
+	else
+	{
+		// add structures in desired order
+		m_vAtoms_allStructures.clear();
+		m_vAtoms_allStructures.insert(m_vAtoms_allStructures.end(), m_vAtoms_rna.begin(), m_vAtoms_rna.end());
+		m_vAtoms_allStructures.insert(m_vAtoms_allStructures.end(), m_vAtoms_dna.begin(), m_vAtoms_dna.end());
+		m_vAtoms_allStructures.insert(m_vAtoms_allStructures.end(), m_vAtoms_protein.begin(), m_vAtoms_protein.end());
+		
+
+		std::vector<Atom> v_atoms;
+		std::string chain_seq;
+		Residue residue;
+		Chain chain;
+		for(size_t i_atom  = 0; i_atom < m_vAtoms_allStructures.size()-1; ++i_atom)
 		{
-			residue.v_atoms_in_residue.insert(residue.v_atoms_in_residue.end(), v_atoms.begin(), v_atoms.end());
-			v_atoms.clear();
-			residue.residue_name = del_spaces(m_vAtoms_allStructures[i_atom].nuclName);
-			chain.v_residues_in_chain.emplace_back(residue);
-			residue.v_atoms_in_residue.clear();
-			if(m_vAtoms_allStructures[i_atom].chainId != m_vAtoms_allStructures[i_atom + 1].chainId)
+			v_atoms.emplace_back(m_vAtoms_allStructures[i_atom]);
+			if(m_vAtoms_allStructures[i_atom].nuclNumber != m_vAtoms_allStructures[i_atom + 1].nuclNumber)
 			{
-				m_vChains.push_back(chain);
-				chain.v_residues_in_chain.clear();
+				residue.v_atoms_in_residue.insert(residue.v_atoms_in_residue.end(), v_atoms.begin(), v_atoms.end());
+				v_atoms.clear();
+				residue.residue_name = del_spaces(m_vAtoms_allStructures[i_atom].nuclName);
+				chain.v_residues_in_chain.emplace_back(residue);
+				residue.v_atoms_in_residue.clear();
+				if(m_vAtoms_allStructures[i_atom].chainId != m_vAtoms_allStructures[i_atom + 1].chainId)
+				{
+					m_vChains.push_back(chain);
+					chain.v_residues_in_chain.clear();
+				}
 			}
 		}
+		
+		residue.v_atoms_in_residue.insert(residue.v_atoms_in_residue.end(), v_atoms.begin(), v_atoms.end());
+		chain.v_residues_in_chain.emplace_back(residue);
+		m_vChains.push_back(chain);
 	}
-	
-	residue.v_atoms_in_residue.insert(residue.v_atoms_in_residue.end(), v_atoms.begin(), v_atoms.end());
-	chain.v_residues_in_chain.emplace_back(residue);
-	m_vChains.push_back(chain);
-	
 	
 	// initializing ranges;
 	m_rna_range.start = m_dna_range.start = m_protein_range.start = 0;
@@ -135,7 +167,6 @@ void Structures::readPDB_allStructures(const std::filesystem::path& inputPath)
 		m_protein_range.end = m_protein_range.start + protein_size - 1;
 	}
 	
-	create_all_seq();
 	all_size = rna_size + dna_size + protein_size;
 	
 }
@@ -166,6 +197,7 @@ void Structures::readPDB_protein(const std::filesystem::path& inputPath)
 
 void Structures::sepRNA()
 {
+	m_vAtoms_rna.clear();
 	m_vAtoms_rna.reserve(m_vAtoms_allStructures.size());
 	for(auto const& atom : m_vAtoms_allStructures)
 	{
@@ -179,6 +211,7 @@ void Structures::sepRNA()
 
 void Structures::sepDNA()
 {
+	m_vAtoms_dna.clear();
 	m_vAtoms_dna.reserve(m_vAtoms_allStructures.size());
 	for(auto const& atom : m_vAtoms_allStructures)
 	{
@@ -192,6 +225,7 @@ void Structures::sepDNA()
 
 void Structures::sepProtein()
 {
+	m_vAtoms_protein.clear();
 	m_vAtoms_protein.reserve(m_vAtoms_allStructures.size());
 	for(auto const& atom : m_vAtoms_allStructures)
 	{
@@ -250,7 +284,6 @@ std::vector<std::string> Structures::extract_rna_seq()
 	chain_seq += del_spaces(m_vAtoms_rna[m_vAtoms_rna.size()-1].nuclName);
 	rna_size += chain_seq.size();
 	rna_seq.emplace_back(chain_seq);
-
 	return rna_seq;
 }
 
@@ -312,6 +345,191 @@ std::vector<std::string> Structures::extract_protein_seq()
 	protein_seq.emplace_back(chain_seq);
 	
 	return protein_seq;
+}
+
+void Structures::read_restraint_file(const std::filesystem::path& restrainPath)
+{
+	std::ifstream res_file(restrainPath.string());
+	std::string line;
+	std::getline(res_file, line);
+	
+	//separate chains
+	std::vector<std::string> v_chains_restraint;
+	std::istringstream iss(line);
+	std::string chain_restraint;
+	while(iss >> chain_restraint)
+	{
+		v_chains_restraint.emplace_back(chain_restraint);
+	}
+	
+	//// concatenate all sequence
+	//std::string seq;
+	//std::ostringstream oss;
+	//std::copy(m_sequence_sep_chains.begin(), m_sequence_sep_chains.end()-1, std::ostream_iterator<std::string>(oss, " "));
+	//oss << m_sequence_sep_chains[m_sequence_sep_chains.size()-1];
+	//seq = oss.str();
+	
+	// check the constency of the restraint file and pdb file
+	if(v_chains_restraint.size() != m_sequence_sep_chains.size())
+	{
+		std::cout << "restraint file and pdb file are not consistant\n";
+		std::cout << "sequence : ";
+		std::copy(m_sequence_sep_chains.begin(), m_sequence_sep_chains.end(), std::ostream_iterator<std::string>(std::cout, " "));
+		std::cout << std::endl;
+		std::cout << "restraint: ";
+		std::copy(v_chains_restraint.begin(), v_chains_restraint.end(), std::ostream_iterator<std::string>(std::cout, " "));
+		std::cout << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	
+	// update the all strcutures vector
+	std::vector<Atom> v_atoms_update;
+	for(int i {0}; i < std::ssize(m_vAtoms_allStructures); ++i)
+	{
+		if(line[m_vAtoms_allStructures[i].nuclNumber - 1] == 'x') v_atoms_update.emplace_back( m_vAtoms_allStructures[i]);
+	}
+	
+	m_vAtoms_allStructures = v_atoms_update;
+
+		std::vector<Atom> v_atoms;
+	std::string chain_seq;
+	Residue residue;
+	Chain chain;
+	for(size_t i_atom  = 0; i_atom < m_vAtoms_allStructures.size()-1; ++i_atom)
+	{
+		v_atoms.emplace_back(m_vAtoms_allStructures[i_atom]);
+		if(m_vAtoms_allStructures[i_atom].nuclNumber != m_vAtoms_allStructures[i_atom + 1].nuclNumber)
+		{
+			residue.v_atoms_in_residue.insert(residue.v_atoms_in_residue.end(), v_atoms.begin(), v_atoms.end());
+			v_atoms.clear();
+			residue.residue_name = del_spaces(m_vAtoms_allStructures[i_atom].nuclName);
+			chain.v_residues_in_chain.emplace_back(residue);
+			residue.v_atoms_in_residue.clear();
+			if(m_vAtoms_allStructures[i_atom + 1].nuclNumber - m_vAtoms_allStructures[i_atom].nuclNumber > 1)
+			{
+				m_vChains.push_back(chain);
+				chain.v_residues_in_chain.clear();
+			}
+		}
+	}
+	
+	residue.v_atoms_in_residue.insert(residue.v_atoms_in_residue.end(), v_atoms.begin(), v_atoms.end());
+	chain.v_residues_in_chain.emplace_back(residue);
+	m_vChains.push_back(chain);
+
+	std::cout << m_vChains.size() << std::endl;
+	
+	//update sequence
+	std::vector<std::string> v_chains_seq_update;
+	v_chains_seq_update.resize(m_sequence_sep_chains.size());
+	for(int i {0}; i < std::ssize(v_chains_restraint); ++i)
+	{
+		for(int j {0}; j < std::ssize(v_chains_restraint[i]); ++j)
+		{
+			if(v_chains_restraint[i][j] == 'x') v_chains_seq_update[i] += m_sequence_sep_chains[i][j];
+		}
+	}
+	m_sequence_sep_chains = v_chains_seq_update;
+	//std::cout << "Udated sequence\n";
+	//std::copy(m_sequence_sep_chains.begin(), m_sequence_sep_chains.end(), std::ostream_iterator<std::string>(std::cout, " "));
+	//std::cout << '\n';
+}
+
+void Structures::read_contacts_interst(std::filesystem:: path const& ci_path)
+{
+	std::ifstream ci_file(ci_path.string());
+	std::string line;
+	
+	while(std::getline(ci_file, line))
+	{
+		std::string s_num;
+		std::istringstream iss{line};
+		std::vector<int> v_tmp;
+		while(iss >> s_num)
+		{
+			v_tmp.push_back(std::stoi(s_num));
+		}
+		// std::cout << v_tmp[0] << "--" << v_tmp[1] << std::endl;
+		m_vp_contacts_interest.push_back({v_tmp[0], v_tmp[1]});
+	}
+
+	ci_file.close();
+}
+
+void Structures::check_contacts_interest(std::filesystem::path const& ci_path, std::filesystem::path const& out_path)
+{
+	read_contacts_interst(ci_path);
+	int number_atoms_in_contact = 0;
+	std::vector<int> v_ints(m_vp_contacts_interest.size());
+	int m = 0, n_ok = 0;
+	int seq_size = m_vChains[0].v_residues_in_chain.size();
+	std::vector<bool> v_bools(seq_size,false);
+	
+	for(auto const& pair : m_vp_contacts_interest)
+	{
+		//std::cout << "size: " <<  std::ssize(m_vChains[0].v_residues_in_chain[pair.first-1].v_atoms_in_residue) << std::endl;
+		for(int i_atom {0}; i_atom < std::ssize(m_vChains[0].v_residues_in_chain[pair.first-1].v_atoms_in_residue); ++i_atom)
+		{
+			int n = 0;
+			
+			for(int j_atom {0}; j_atom < std::ssize(m_vChains[0].v_residues_in_chain[pair.second-1].v_atoms_in_residue); ++j_atom)
+			{
+				number_atoms_in_contact = 0;
+				auto dist = m_vChains[0].v_residues_in_chain[pair.first-1].v_atoms_in_residue[i_atom].coord.distance(
+							m_vChains[0].v_residues_in_chain[pair.second-1].v_atoms_in_residue[j_atom].coord);
+				if(dist < m_distance_threshold)
+				{
+					//std::cout << m_vChains[0].v_residues_in_chain[pair.first-1].residue_name << "--"
+							  //<<pair.first  << "--" << i_atom << " " 
+							  //<< m_vChains[0].v_residues_in_chain[pair.second-1].residue_name << "--"
+							  //<< pair.second << "--" << j_atom << " --> " << dist << std::endl;
+					++n;
+					if(n == m_number_atoms_in_contact)
+					{
+						number_atoms_in_contact = n;
+						break;
+					}
+				}
+			}
+			if(number_atoms_in_contact == m_number_atoms_in_contact)
+			{
+				// cout << pair.first << "<-->" << pair.second << " " << " " << distance << endl;
+				v_ints[m] = 1;
+				v_bools[pair.first-1] = true;
+				v_bools[pair.second-1] = true;
+				++n_ok;
+				break;
+			}
+		}
+		
+		//auto dist =  m_vChains[0].v_residues_in_chain[pair.first-1].v_atoms_in_residue[pair.first].coord.distance(
+							//m_vChains[0].v_residues_in_chain[pair.second-1].v_atoms_in_residue[pair.second].coord);
+		//std::coou <
+		//if(dist < m_distance_threshold)
+		//{
+			//std::cout << dist << " --> " << pair.first << "--" << pair.second << std::endl;
+		//}
+		++m;
+	}
+	
+	std::ofstream out_file(out_path.string());
+	std::ofstream out_file2(out_path.string() + "_2");
+	
+	std::copy(v_ints.begin(), v_ints.end() - 1, std::ostream_iterator<int>(out_file, ","));
+	out_file << v_ints[v_ints.size() - 1] << std::endl;
+	//out_file2
+	std::copy(v_bools.begin(), v_bools.end() - 1, std::ostream_iterator<int>(out_file2, ","));
+	out_file2 << v_bools[seq_size - 1] << std::endl;
+	//out_file << n_ok << ",";
+	//if(n_ok >= 4)
+	//{
+		//out_file << 1 << std::endl;
+	//}
+	//else
+	//{
+		//out_file << 0 << std::endl;
+	//}
+
 }
 
 std::string Structures::get_requested_molecules() const
@@ -380,6 +598,7 @@ void Structures::set_is_plot_requested(bool is_plot_requested)
 void Structures::create_all_seq()
 {
 	auto itR = std::find_if(m_requested_molecules.begin(), m_requested_molecules.end(), [](char c){return (c == 'R' || c == 'r');});
+
 	if(itR != m_requested_molecules.end())
 	{
 		if(m_vAtoms_rna.size() > 0)
@@ -443,58 +662,63 @@ void Structures::calc_distance_contact_all()
 						{
 							auto distance = m_vChains[i_chain].v_residues_in_chain[i_residue].v_atoms_in_residue[i_atom].coord.distance(
 							m_vChains[j_chain].v_residues_in_chain[j_residue].v_atoms_in_residue[j_atom].coord);
+							
 					
 							if(distance < m_distance_threshold)
 							{
 								++n;
-								if(n == m_number_atoms_in_contact){ number_atoms_in_contact = n; continue;}
+								if(n == m_number_atoms_in_contact)
+								{	
+									number_atoms_in_contact = n; continue;
+								}
 							}
 						}
 					}
 					if(number_atoms_in_contact == m_number_atoms_in_contact)
 					{
 						if(i == j)	m_contact_map[i][j] = m_contact_map[j][i] = 0;
-						else if( abs(int(i - j)) == 1) m_contact_map[i][j] = m_contact_map[j][i] = 9; //immediate residues.
+						else if( abs(int(i - j)) == 1) m_contact_map[i][j] = m_contact_map[j][i] = 2; //immediate residues.
 						else
 						{
-							//rna-rna
-							if(i < m_rna_range.end && j < m_rna_range.end)
-							{
-								m_contact_map[i][j] = m_contact_map[j][i] = 1;
-							}
+							m_contact_map[i][j] = m_contact_map[j][i] = 1;
+							////rna-rna
+							//if(i < m_rna_range.end && j < m_rna_range.end)
+							//{
+								//m_contact_map[i][j] = m_contact_map[j][i] = 1;
+							//}
 							
-							//dna-dna
-							if(m_dna_range.start <= i && i < m_dna_range.end  && m_dna_range.start <= j && j < m_dna_range.end)
-							{
-								m_contact_map[i][j] = m_contact_map[j][i] = 2;
-							}
+							////dna-dna
+							//if(m_dna_range.start <= i && i < m_dna_range.end  && m_dna_range.start <= j && j < m_dna_range.end)
+							//{
+								//m_contact_map[i][j] = m_contact_map[j][i] = 1;
+							//}
 							
-							//protein-protein
-							if(m_protein_range.start <= i && i < m_protein_range.end  && m_protein_range.start <= j && j < m_protein_range.end)
-							{
-								m_contact_map[i][j] = m_contact_map[j][i] = 3;
-							}
+							////protein-protein
+							//if(m_protein_range.start <= i && i < m_protein_range.end  && m_protein_range.start <= j && j < m_protein_range.end)
+							//{
+								//m_contact_map[i][j] = m_contact_map[j][i] = 3;
+							//}
 							
-							//rna-dna
-							if((m_rna_range.end > i && m_dna_range.start <= j && j < m_dna_range.end)
-							|| (m_rna_range.end > j && m_dna_range.start <= i && i < m_dna_range.end))
-							{
-								m_contact_map[i][j] = m_contact_map[j][i] = 4;
-							}
+							////rna-dna
+							//if((m_rna_range.end > i && m_dna_range.start <= j && j < m_dna_range.end)
+							//|| (m_rna_range.end > j && m_dna_range.start <= i && i < m_dna_range.end))
+							//{
+								//m_contact_map[i][j] = m_contact_map[j][i] = 4;
+							//}
 							
-							//rna-protein
-							if((m_rna_range.end > i && m_protein_range.start <= j && j < m_protein_range.end)
-							|| (m_rna_range.end > j && m_protein_range.start <= i && i < m_protein_range.end))
-							{
-								m_contact_map[i][j] = m_contact_map[j][i] = 5;
-							}
+							////rna-protein
+							//if((m_rna_range.end > i && m_protein_range.start <= j && j < m_protein_range.end)
+							//|| (m_rna_range.end > j && m_protein_range.start <= i && i < m_protein_range.end))
+							//{
+								//m_contact_map[i][j] = m_contact_map[j][i] = 5;
+							//}
 							
-							//dna-protein
-							if((m_dna_range.end > i && m_protein_range.start <= j && j < m_protein_range.end)
-							|| (m_dna_range.end > j && m_protein_range.start <= i && i < m_protein_range.end))
-							{
-								m_contact_map[i][j] = m_contact_map[j][i] = 6;
-							}
+							////dna-protein
+							//if((m_dna_range.end > i && m_protein_range.start <= j && j < m_protein_range.end)
+							//|| (m_dna_range.end > j && m_protein_range.start <= i && i < m_protein_range.end))
+							//{
+								//m_contact_map[i][j] = m_contact_map[j][i] = 6;
+							//}
 							
 						}
 					}
@@ -1052,8 +1276,15 @@ void Structures::write_as_dot_bracket(const std::filesystem::path& outputPath) c
 void Structures::write_seq(const std::filesystem::path& outputPath) const
 {
 	std::ofstream outFile(outputPath.string());
-	std::copy(m_sequence_sep_chains.begin(), m_sequence_sep_chains.end()-1, std::ostream_iterator<std::string>(outFile, " "));
-	outFile << m_sequence_sep_chains[m_sequence_sep_chains.size()-1]<<endl;
+	if(std::ssize(m_sequence_sep_chains) == 1)
+	{
+		outFile << m_sequence_sep_chains[m_sequence_sep_chains.size()-1]<<endl;
+	}
+	else
+	{
+		std::copy(m_sequence_sep_chains.begin(), m_sequence_sep_chains.end()-1, std::ostream_iterator<std::string>(outFile, " "));
+		outFile << m_sequence_sep_chains[m_sequence_sep_chains.size()-1]<<endl;
+	}
 }
 
 
@@ -1061,7 +1292,6 @@ void Structures::write_map(const std::filesystem::path& outputPath, const std::v
 {
 	std::ofstream outFile(outputPath.string());
 	std::ofstream outFile2(outputPath.string() + "_2");
-	
 	for(size_t i { 0 }; i < contact_map.size(); ++i)
 	{
 		for(size_t j { 0 }; j < contact_map.size(); ++j)
@@ -1079,89 +1309,89 @@ void Structures::write_map(const std::filesystem::path& outputPath, const std::v
 
 void Structures::write_map(const std::filesystem::path& outputPath) const
 {
-	auto itR = std::find_if(m_requested_molecules.begin(), m_requested_molecules.end(), [](char c){return (c == 'R' || c == 'r');});
-	auto itD = std::find_if(m_requested_molecules.begin(), m_requested_molecules.end(), [](char c){return (c == 'D' || c == 'd');});
-	auto itP = std::find_if(m_requested_molecules.begin(), m_requested_molecules.end(), [](char c){return (c == 'P' || c == 'p');});
+	//auto itR = std::find_if(m_requested_molecules.begin(), m_requested_molecules.end(), [](char c){return (c == 'R' || c == 'r');});
+	//auto itD = std::find_if(m_requested_molecules.begin(), m_requested_molecules.end(), [](char c){return (c == 'D' || c == 'd');});
+	//auto itP = std::find_if(m_requested_molecules.begin(), m_requested_molecules.end(), [](char c){return (c == 'P' || c == 'p');});
 	
-	if(itR != m_requested_molecules.end())
-	{
-			std::ostringstream oss_rna;
-			std::ostringstream oss_plot_rna;
-			oss_rna << outputPath.parent_path().string() << "/" << outputPath.stem().string() << "_RNA_.map";
-			oss_plot_rna << outputPath.parent_path().string() << "/" << outputPath.stem().string() << "_RNA_.png";
-			write_map(oss_rna.str(), m_contact_map_rna);
-			cout << "\n\t\t **** plot -R- contacts ****\n";
-			plot(oss_plot_rna.str(), oss_rna.str());
-	}
+	//if(itR != m_requested_molecules.end())
+	//{
+			//std::ostringstream oss_rna;
+			//std::ostringstream oss_plot_rna;
+			//oss_rna << outputPath.parent_path().string() << "/" << outputPath.stem().string() << "_RNA_.map";
+			//oss_plot_rna << outputPath.parent_path().string() << "/" << outputPath.stem().string() << "_RNA_.png";
+			//write_map(oss_rna.str(), m_contact_map_rna);
+			//cout << "\n\t\t **** plot -R- contacts ****\n";
+			//plot(oss_plot_rna.str(), oss_rna.str());
+	//}
 	
-	if(itD != m_requested_molecules.end())
-	{
-		std::ostringstream oss_dna;
-		std::ostringstream oss_plot_dna;
-		oss_dna << outputPath.parent_path().string() << "/" << outputPath.stem().string() << "_DNA.map";
-		oss_plot_dna << outputPath.parent_path().string() << "/" << outputPath.stem().string() << "_DNA.png";
-		write_map(oss_dna.str(), m_contact_map_dna);
-		cout << "\n\t\t **** plot -D- contacts ****\n";
-		plot(oss_plot_dna.str(), oss_dna.str());
-	}
+	//if(itD != m_requested_molecules.end())
+	//{
+		//std::ostringstream oss_dna;
+		//std::ostringstream oss_plot_dna;
+		//oss_dna << outputPath.parent_path().string() << "/" << outputPath.stem().string() << "_DNA.map";
+		//oss_plot_dna << outputPath.parent_path().string() << "/" << outputPath.stem().string() << "_DNA.png";
+		//write_map(oss_dna.str(), m_contact_map_dna);
+		//cout << "\n\t\t **** plot -D- contacts ****\n";
+		//plot(oss_plot_dna.str(), oss_dna.str());
+	//}
 	
-	if(itP != m_requested_molecules.end())
-	{
-		std::ostringstream oss_protein;
-		std::ostringstream oss_plot_protein;
-		oss_protein << outputPath.parent_path().string() << "/" << outputPath.stem().string() << "_Protein.map";
-		oss_plot_protein << outputPath.parent_path().string() << "/" << outputPath.stem().string() << "_Protein.png";
-		write_map(oss_protein.str(), m_contact_map_protein);
-		cout << "\n\t\t **** plot -P- contacts ****\n";
-		plot(oss_plot_protein.str(), oss_protein.str());
-	}
+	//if(itP != m_requested_molecules.end())
+	//{
+		//std::ostringstream oss_protein;
+		//std::ostringstream oss_plot_protein;
+		//oss_protein << outputPath.parent_path().string() << "/" << outputPath.stem().string() << "_Protein.map";
+		//oss_plot_protein << outputPath.parent_path().string() << "/" << outputPath.stem().string() << "_Protein.png";
+		//write_map(oss_protein.str(), m_contact_map_protein);
+		//cout << "\n\t\t **** plot -P- contacts ****\n";
+		//plot(oss_plot_protein.str(), oss_protein.str());
+	//}
 	
-	if(itR != m_requested_molecules.end() && itD != m_requested_molecules.end())
-	{
-		std::ostringstream oss_rna_dna;
-		std::ostringstream oss_plot_rna_dna;
-		oss_rna_dna << outputPath.parent_path().string() << "/" << outputPath.stem().string() << "_RNA_DNA.map";
-		oss_plot_rna_dna << outputPath.parent_path().string() << "/" << outputPath.stem().string() << "_RNA_DNA.png";
-		write_map(oss_rna_dna.str(), m_contact_map_rna_dna);
-		if(m_calculation_type == "INTER" || m_calculation_type == "ALL")
-		{
-			cout << "\n\t\t **** plot R-D contacts ****\n";
-			plot(oss_plot_rna_dna.str(), oss_rna_dna.str());
-		}
-	}
+	//if(itR != m_requested_molecules.end() && itD != m_requested_molecules.end())
+	//{
+		//std::ostringstream oss_rna_dna;
+		//std::ostringstream oss_plot_rna_dna;
+		//oss_rna_dna << outputPath.parent_path().string() << "/" << outputPath.stem().string() << "_RNA_DNA.map";
+		//oss_plot_rna_dna << outputPath.parent_path().string() << "/" << outputPath.stem().string() << "_RNA_DNA.png";
+		//write_map(oss_rna_dna.str(), m_contact_map_rna_dna);
+		//if(m_calculation_type == "INTER" || m_calculation_type == "ALL")
+		//{
+			//cout << "\n\t\t **** plot R-D contacts ****\n";
+			//plot(oss_plot_rna_dna.str(), oss_rna_dna.str());
+		//}
+	//}
 	
-	if(itR != m_requested_molecules.end() && itP != m_requested_molecules.end())
-	{
-		std::ostringstream oss_rna_protein;
-		std::ostringstream oss_plot_rna_protein;
-		oss_rna_protein << outputPath.parent_path().string() << "/" << outputPath.stem().string() << "_RNA_Protein.map";
-		oss_plot_rna_protein << outputPath.parent_path().string() << "/" << outputPath.stem().string() << "_RNA_Protein.png";
-		write_map(oss_rna_protein.str(), m_contact_map_rna_protein);
-		if(m_calculation_type == "INTER" || m_calculation_type == "ALL")
-		{
-			cout << "\n\t\t **** plot R-P contacts ****\n";
-			plot(oss_plot_rna_protein.str(), oss_rna_protein.str());
-		}
-	}
+	//if(itR != m_requested_molecules.end() && itP != m_requested_molecules.end())
+	//{
+		//std::ostringstream oss_rna_protein;
+		//std::ostringstream oss_plot_rna_protein;
+		//oss_rna_protein << outputPath.parent_path().string() << "/" << outputPath.stem().string() << "_RNA_Protein.map";
+		//oss_plot_rna_protein << outputPath.parent_path().string() << "/" << outputPath.stem().string() << "_RNA_Protein.png";
+		//write_map(oss_rna_protein.str(), m_contact_map_rna_protein);
+		//if(m_calculation_type == "INTER" || m_calculation_type == "ALL")
+		//{
+			//cout << "\n\t\t **** plot R-P contacts ****\n";
+			//plot(oss_plot_rna_protein.str(), oss_rna_protein.str());
+		//}
+	//}
 	
-	if(itD != m_requested_molecules.end() && itP != m_requested_molecules.end())
-	{
-		std::ostringstream oss_dna_protein;
-		std::ostringstream oss_plot_dna_protein;
-		oss_dna_protein << outputPath.parent_path().string() << "/" << outputPath.stem().string() << "_DNA_Protein.map";
-		oss_plot_dna_protein << outputPath.parent_path().string() << "/" << outputPath.stem().string() << "_DNA_Protein.png";
-		write_map(oss_dna_protein.str(), m_contact_map_dna_protein);
-		if(m_calculation_type == "INTER" || m_calculation_type == "ALL")
-		{
-			cout << "\n\t\t **** plot D-P contacts ****\n";
-			plot(oss_plot_dna_protein.str(), oss_dna_protein.str());
-		}
-	}
+	//if(itD != m_requested_molecules.end() && itP != m_requested_molecules.end())
+	//{
+		//std::ostringstream oss_dna_protein;
+		//std::ostringstream oss_plot_dna_protein;
+		//oss_dna_protein << outputPath.parent_path().string() << "/" << outputPath.stem().string() << "_DNA_Protein.map";
+		//oss_plot_dna_protein << outputPath.parent_path().string() << "/" << outputPath.stem().string() << "_DNA_Protein.png";
+		//write_map(oss_dna_protein.str(), m_contact_map_dna_protein);
+		//if(m_calculation_type == "INTER" || m_calculation_type == "ALL")
+		//{
+			//cout << "\n\t\t **** plot D-P contacts ****\n";
+			//plot(oss_plot_dna_protein.str(), oss_dna_protein.str());
+		//}
+	//}
 	
 	std::ostringstream oss_all;
 	std::ostringstream oss_plot_all;
-	oss_all << outputPath.parent_path().string() << "/" << outputPath.stem().string() << "_All.map";
-	oss_plot_all << outputPath.parent_path().string() << "/" << outputPath.stem().string() << "_All.png";
+	oss_all << outputPath.string() << "_All.map";
+	oss_plot_all << outputPath.string() << "_All.png";
 	write_map(oss_all.str(), m_contact_map);
 	cout << "\n\t\t **** plot all contacts ****\n";
 	plot(oss_plot_all.str(), oss_all.str());
@@ -1184,7 +1414,7 @@ void Structures::plot(const std::filesystem::path& outputPath, const std::filesy
 	gnu("set term png size 1000,1000");
 	gnu(output);
 	gnu("set pm3d map");
-	gnu("set palette defined( 0 \"white\", 1 \"red\", 2 \"blue\", 3 \"yellow\", 4 \"purple\", 5 \"dark-orange\", 6 \"green\", 9 \"grey\" )");
+	gnu("set palette defined( 0 \"white\", 1 \"black\", 2 \"grey\")");
 	gnu("set yrange [0:*] reverse");
 	gnu("unset ytics");
 	gnu("unset xtics");
@@ -1192,10 +1422,3 @@ void Structures::plot(const std::filesystem::path& outputPath, const std::filesy
 	//gnu("unset border");
 	gnu(input);	
 }
-
-
-
-
-
-
-

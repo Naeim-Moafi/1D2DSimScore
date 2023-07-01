@@ -43,7 +43,12 @@ Optional arguments:
 
 -m or --map: to create and visualize residue-residue contact maps
 
+-C or --contact-checker: to check only specific contacts (for one chain structures only)
+
 Usage:
 	
 	./ContactExtractor -p samples/3wbm.pdb -c RP -d 7 -n 3 -t INTER -m -o results/3wbm
+or
+	
+	./ContactExtractor -p samples/sample.pdn -c R -d 7 -n 3 -t ALL -C sample.ci -m -o results/sample.ci
 

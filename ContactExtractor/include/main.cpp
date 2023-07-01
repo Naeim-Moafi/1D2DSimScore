@@ -48,6 +48,8 @@ void showHelp(){
 	cout << "-n or --number_atoms_in_contact: it indicates least number of atoms in contact of each residue to consider two residue are in a interaction\n";
 	cout << "-o or --outputName: name of output file (path + basename, and program will add its extension to that)\n";
 	cout << "-m or --map: to create and visualize residue-residue contact maps\n";
+	cout << "-S or --selection: to select only part of the strcuters for calculation\n";
+	cout << "-C or --contact-checker: to check only specific contacts (for one chain structures only)\n";
 
 	cout << "Usage:\n\t./ContactExtractor -p samples/3wbm.pdb -c RP -d 7 -n 3 -t INTER -m -o results/3wbm\n";
 	exit(EXIT_FAILURE);
@@ -59,11 +61,13 @@ int main(int argc, char* argv[])
 		showHelp();
 	}
 	
-    [[maybe_unused]]string rnaPath, dnaPath, proteinPath, pdbPath, outFilename, requested_complex, calculation_type; 
+    [[maybe_unused]]string rnaPath, dnaPath, proteinPath, pdbPath, outFilename, requested_complex, calculation_type, selection_path;
+	[[maybe_unused]] string ci_path; 
     double distance = 6.0;
     int number_atoms_in_contact = 2;
-    bool  outFilenameFlag, rnaFlag, dnaFlag, proteinFlag, pdbFlag, distanceFlag, numberFlag, complexFlag, mapFlag, typeFlag;
-     outFilenameFlag = rnaFlag = dnaFlag = proteinFlag = pdbFlag = distanceFlag = numberFlag = complexFlag = mapFlag = false;
+    bool  outFilenameFlag, rnaFlag, dnaFlag, proteinFlag, pdbFlag, distanceFlag, numberFlag, complexFlag, mapFlag, typeFlag, selection_flag;
+	bool ci_flag = false;
+     outFilenameFlag = rnaFlag = dnaFlag = proteinFlag = pdbFlag = distanceFlag = numberFlag = complexFlag = mapFlag = selection_flag = false;
 
     const struct option long_opts[] = {
     	{"rna", required_argument, nullptr,'R'},
@@ -75,7 +79,9 @@ int main(int argc, char* argv[])
     	{"number_atoms_in_contact", required_argument, nullptr, 'n'},
     	{"outputName", required_argument, nullptr, 'o'},
     	{"calculation_type", required_argument, nullptr, 't'},
+    	{"selction", required_argument, nullptr, 's'},
     	{"map", no_argument, nullptr, 'm'},
+		{"--contact-checker", required_argument, nullptr, 'C'},
     	{"help", no_argument, nullptr, 'h'},
     	{0,0,0,0}
     };
@@ -85,7 +91,7 @@ int main(int argc, char* argv[])
     while (true)
     {
         //const auto opt = getopt_long(argc, argv,"t:f:c::r::dmo", long_opts, nullptr);
-    	const auto opt = getopt_long(argc, argv,"R:D:P:p:d:n:c:o:t:mh", long_opts, &optind);
+    	const auto opt = getopt_long(argc, argv,"R:D:P:p:d:n:c:o:t:C:S:mh", long_opts, &optind);
         if (opt == -1)
         {
             break;
@@ -147,6 +153,15 @@ int main(int argc, char* argv[])
 				mapFlag = true;
 				break;
 				
+			case 'S':
+				selection_flag = true;
+				selection_path = optarg;
+				break;
+			case 'C': 
+				ci_flag = true;
+				ci_path = optarg;
+				break;
+
 			case 'h':
 			case '?': 
 			default:
@@ -181,7 +196,7 @@ int main(int argc, char* argv[])
 		outFilename = "resuts";
 	}
 
-	Structures st;	
+	Structures st;
 	if(typeFlag)
 	{
 		st.set_calculation_type(calculation_type);
@@ -190,6 +205,12 @@ int main(int argc, char* argv[])
 	{
 		cout << "Calculation type is required\n";
 		showHelp();
+	}
+	
+	if(selection_flag)
+	{
+		st.update = true;
+		st.selection_path = selection_path;
 	}
 	st.set_is_plot_requested(mapFlag);
 
@@ -225,15 +246,25 @@ int main(int argc, char* argv[])
 			st.readPDB_protein(rnaPath);
 		}
 
-		st.create_all_seq();
+		//st.create_all_seq();
 		//st.calc_distance_contact();
 		//st.write_binary_format(outFilename);
 	}
 	
+	//st.read_restraint_file("restraint.txt");
+	//getchar();
+
 	st.calc_distance_contact();
 	st.write_binary_format(outFilename);
 	st.write_as_dot_bracket(outFilename);
 	if(mapFlag) st.write_map(outFilename);
+
+	if(ci_flag)
+	{
+		st.check_contacts_interest(ci_path, outFilename + ".csv");
+	}
+
+
 	auto end = high_resolution_clock::now();
 	auto duration = duration_cast<seconds>(end - start);
 	
@@ -241,9 +272,6 @@ int main(int argc, char* argv[])
 	cout << "it took " << duration.count() << "s" << endl;
 	
 	
-	cout << "Done ;)" << endl;
-
-	
-	
+	cout << "Done ;)" << endl;	
 	return 0;
 }
